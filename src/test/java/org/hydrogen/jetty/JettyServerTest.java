@@ -2,7 +2,6 @@ package org.hydrogen.jetty;
 
 import org.hydrogen.HTMLResponse;
 import org.hydrogen.Server;
-import org.hydrogen.TextResponse;
 import org.junit.Test;
 
 public class JettyServerTest {
