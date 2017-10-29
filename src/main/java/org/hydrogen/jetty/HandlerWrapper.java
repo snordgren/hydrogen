@@ -4,10 +4,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.hydrogen.Handler;
 import org.hydrogen.Request;
 import org.hydrogen.Response;
-import org.hydrogen.ResponseAdapter;
-import org.hydrogen.TextResponse;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

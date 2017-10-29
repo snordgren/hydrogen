@@ -11,7 +11,7 @@ import org.hydrogen.Handler;
 
 import java.util.concurrent.TimeUnit;
 
-public class JettyServer {
+public class JettyServer implements org.hydrogen.Server {
     private static final int DEFAULT_PORT = 8080;
 
     private final Handler handler;
@@ -23,24 +23,13 @@ public class JettyServer {
         this.handler = handler;
         this.port = port;
         Server initialServer = new Server(new QueuedThreadPool(100, 4, 1000));
-        serverConnector = createSocketConnector(initialServer,
-                "0.0.0.0", port);
+        serverConnector = createSocketConnector(initialServer, "0.0.0.0", port);
         serverConnector.setPort(port);
         server = serverConnector.getServer();
         server.setConnectors(new Connector[]{serverConnector});
         server.setHandler(new HandlerWrapper(handler));
         try {
             server.start();
-            server.join();
-            //Thread.currentThread().join();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void stop() {
-        try {
-            server.stop();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -68,5 +57,24 @@ public class JettyServer {
 
     public static JettyServer start(Handler handler, int port) {
         return new JettyServer(handler, port);
+    }
+
+
+    @Override
+    public void join() {
+        try {
+            server.join();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void stop() {
+        try {
+            server.stop();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

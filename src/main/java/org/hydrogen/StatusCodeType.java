@@ -10,6 +10,7 @@ public enum StatusCodeType {
     SERVER_ERROR(500);
 
     private final int rangeStart;
+
     StatusCodeType(int rangeStart) {
         this.rangeStart = rangeStart;
     }

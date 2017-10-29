@@ -12,15 +12,15 @@ public abstract class Response {
         this.statusCode = statusCode;
     }
 
+    public static Response plainText(String html) {
+        throw new UnsupportedOperationException();
+    }
+
     public abstract void accept(ResponseAdapter adapter);
 
     public abstract byte[] getBytes();
 
     public StatusCode getStatusCode() {
         return statusCode;
-    }
-
-    public static Response plainText(String html) {
-        throw new UnsupportedOperationException();
     }
 }

@@ -1,11 +1,14 @@
 package org.hydrogen.jetty;
 
+import org.hydrogen.HTMLResponse;
+import org.hydrogen.Server;
 import org.hydrogen.TextResponse;
 import org.junit.Test;
 
 public class JettyServerTest {
     @Test
-    public void testRunServer() {
-        JettyServer.start(request -> TextResponse.ok("Hello, world!"));
+    public void testHTML() {
+        Server server = JettyServer.start(request -> HTMLResponse.ok("<h1>Hi!</h1>"));
+        server.join();
     }
 }
