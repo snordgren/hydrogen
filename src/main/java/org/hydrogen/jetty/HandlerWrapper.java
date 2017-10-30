@@ -24,5 +24,6 @@ public class HandlerWrapper extends AbstractHandler {
         Request request = new Request(target);
         Response response = handler.handle(request);
         response.accept(new ResponseAdapterImpl(httpResponse));
+        baseRequest.setHandled(true);
     }
 }
