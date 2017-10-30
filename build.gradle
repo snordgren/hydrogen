@@ -12,4 +12,5 @@ repositories {
 dependencies {
     compile "org.eclipse.jetty:jetty-server:9.4.6.v20170531"
     testCompile "junit:junit:4.12"
+    testCompile "com.mashape.unirest:unirest-java:1.4.9"
 }
