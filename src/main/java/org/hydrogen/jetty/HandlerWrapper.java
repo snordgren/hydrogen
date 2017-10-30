@@ -3,6 +3,7 @@ package org.hydrogen.jetty;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.hydrogen.Handler;
 import org.hydrogen.Request;
+import org.hydrogen.RequestMethod;
 import org.hydrogen.Response;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,8 @@ public class HandlerWrapper extends AbstractHandler {
             org.eclipse.jetty.server.Request baseRequest,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) throws IOException {
-        Request request = new Request(target);
+        RequestMethod method = RequestMethod.valueOf(baseRequest.getMethod().toUpperCase());
+        Request request = new Request(method, target);
         Response response = handler.handle(request);
         response.accept(new ResponseAdapterImpl(httpResponse));
         baseRequest.setHandled(true);
