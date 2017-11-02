@@ -47,7 +47,7 @@ public class JettyServer implements org.hydrogen.Server {
         serverConnector.setPort(port);
         Server server = serverConnector.getServer();
         server.setConnectors(new Connector[]{serverConnector});
-        server.setHandler(new HandlerWrapper(handler));
+        server.setHandler(new JettyHandler(handler));
         try {
             server.start();
         } catch (Exception e) {

@@ -10,10 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class HandlerWrapper extends AbstractHandler {
+public class JettyHandler extends AbstractHandler {
     private final Handler handler;
 
-    public HandlerWrapper(Handler handler) {
+    public JettyHandler(Handler handler) {
         this.handler = handler;
     }
 

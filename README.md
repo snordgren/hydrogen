@@ -12,8 +12,6 @@ serves to build a Handler object containing the logic of the program, which is p
 to the server implementation of choice, which then executes the handler for each
 request made to the server.
 
-### Notes
-Hydrogen does not provide routing nor does it aspire to. That is the domain of
-another package. A default implementation of a server runtime is provided in the
-`org.hydrogen.jetty` package in the `JettyServer` class. Other implementations
-may be added if necessary. WebSockets are not supported.
+## No Magic
+Hydrogen does not contain any static mutable state, runtime code generation,
+annotation processing, or any other kind of control-flow altering feature.

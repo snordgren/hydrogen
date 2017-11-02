@@ -57,11 +57,11 @@ public class JettyServerTest {
     private static class Counter {
         private int currentValue;
 
-        public Counter(int initialValue) {
+        Counter(int initialValue) {
             currentValue = initialValue;
         }
 
-        public int next() {
+        int next() {
             int current = currentValue;
             currentValue++;
             return current;
