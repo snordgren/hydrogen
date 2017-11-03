@@ -1,9 +1,11 @@
 package org.hydrogen.jetty;
 
-import org.hydrogen.ContentResponse;
 import org.hydrogen.HTMLResponse;
+import org.hydrogen.JSONResponse;
 import org.hydrogen.ResponseAdapter;
 import org.hydrogen.TextResponse;
+import org.hydrogen.TextualResponse;
+import org.hydrogen.XMLResponse;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -21,7 +23,7 @@ public class ResponseAdapterImpl implements ResponseAdapter<HttpServletResponse>
         this.servletResponse = servletResponse;
     }
 
-    private HttpServletResponse content(ContentResponse response) {
+    private HttpServletResponse content(TextualResponse response) {
         servletResponse.setContentType(response.getContentType().getText());
         servletResponse.setStatus(response.getStatusCode().getNumber());
         if (response.getBytes().length > 0) {
@@ -43,7 +45,17 @@ public class ResponseAdapterImpl implements ResponseAdapter<HttpServletResponse>
     }
 
     @Override
+    public HttpServletResponse json(JSONResponse response) {
+        return content(response);
+    }
+
+    @Override
     public HttpServletResponse text(TextResponse response) {
+        return content(response);
+    }
+
+    @Override
+    public HttpServletResponse xml(XMLResponse response) {
         return content(response);
     }
 }

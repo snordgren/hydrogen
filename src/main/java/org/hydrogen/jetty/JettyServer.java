@@ -8,6 +8,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.hydrogen.Handler;
+import org.hydrogen.util.ThrowingConsumer;
 
 import java.util.concurrent.TimeUnit;
 
@@ -37,10 +38,10 @@ public class JettyServer implements org.hydrogen.Server {
     }
 
     public static JettyServer start(Handler handler) {
-        return start(handler, DEFAULT_PORT);
+        return start(DEFAULT_PORT, handler);
     }
 
-    public static JettyServer start(Handler handler, int port) {
+    public static JettyServer start(int port, Handler handler) {
         Server initialServer = new Server(new QueuedThreadPool(100, 4, 1000));
         ServerConnector serverConnector = createSocketConnector(initialServer,
                 "0.0.0.0", port);
@@ -56,6 +57,25 @@ public class JettyServer implements org.hydrogen.Server {
         return new JettyServer(server);
     }
 
+    /**
+     * Creates a server exclusively to perform a certain action. The server
+     * will spin up, perform the action passed as a parameter, and then shut
+     * down.
+     *
+     * @param port The port on which to run.
+     * @param handler The request handler.
+     * @param action The action to perform once the server is running.
+     */
+    public static void use(int port, Handler handler,
+            ThrowingConsumer<org.hydrogen.Server> action) {
+        JettyServer server = start(port, handler);
+        try {
+            action.acceptThrows(server);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        server.stop();
+    }
 
     @Override
     public void join() {

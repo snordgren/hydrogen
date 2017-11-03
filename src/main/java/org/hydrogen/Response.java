@@ -12,11 +12,7 @@ public abstract class Response {
         this.statusCode = statusCode;
     }
 
-    public static Response plainText(String html) {
-        throw new UnsupportedOperationException();
-    }
-
-    public abstract void accept(ResponseAdapter adapter);
+    public abstract <T> T accept(ResponseAdapter<T> adapter);
 
     public abstract byte[] getBytes();
 

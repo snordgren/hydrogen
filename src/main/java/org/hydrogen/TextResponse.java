@@ -1,11 +1,12 @@
 package org.hydrogen;
 
-public class TextResponse extends ContentResponse {
-    private final String text;
-
+public class TextResponse extends TextualResponse {
     private TextResponse(StatusCode statusCode, String text) {
-        super(statusCode, ContentType.PLAIN_TEXT);
-        this.text = text;
+        super(statusCode, ContentType.TEXT, text);
+    }
+
+    public static TextResponse notFound(String text) {
+        return new TextResponse(StatusCode.NOT_FOUND, text);
     }
 
     public static TextResponse ok(String text) {
@@ -13,12 +14,7 @@ public class TextResponse extends ContentResponse {
     }
 
     @Override
-    public void accept(ResponseAdapter adapter) {
-        adapter.text(this);
-    }
-
-    @Override
-    public byte[] getBytes() {
-        return text.getBytes(UTF_8);
+    public <T> T accept(ResponseAdapter<T> adapter) {
+        return adapter.text(this);
     }
 }

@@ -1,24 +1,21 @@
 package org.hydrogen;
 
-public class HTMLResponse extends ContentResponse {
-    private final String html;
+public class HTMLResponse extends TextualResponse {
+    private HTMLResponse(StatusCode statusCode, String text) {
+        super(statusCode, ContentType.HTML, text);
+    }
 
-    HTMLResponse(StatusCode statusCode, String html) {
-        super(statusCode, ContentType.HTML);
-        this.html = html;
+    @Override
+    public <T> T accept(ResponseAdapter<T> adapter) {
+        return adapter.html(this);
+    }
+
+    public static HTMLResponse notFound(String html) {
+        return new HTMLResponse(StatusCode.NOT_FOUND, html);
     }
 
     public static HTMLResponse ok(String html) {
         return new HTMLResponse(StatusCode.OK, html);
     }
 
-    @Override
-    public void accept(ResponseAdapter adapter) {
-        adapter.html(this);
-    }
-
-    @Override
-    public byte[] getBytes() {
-        return html.getBytes(UTF_8);
-    }
 }
