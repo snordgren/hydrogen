@@ -13,7 +13,7 @@ import java.io.IOException;
 public class JettyHandler extends AbstractHandler {
     private final Handler handler;
 
-    public JettyHandler(Handler handler) {
+    JettyHandler(Handler handler) {
         this.handler = handler;
     }
 
