@@ -44,11 +44,15 @@ public class Response {
     }
 
     public static Builder notFound() {
-        return new Builder(StatusCode.NOT_FOUND);
+        return status(StatusCode.NOT_FOUND);
     }
 
     public static Builder ok() {
-        return new Builder(StatusCode.OK);
+        return status(StatusCode.OK);
+    }
+
+    public static Builder status(StatusCode statusCode) {
+        return new Builder(statusCode);
     }
 
     public static class Builder {
