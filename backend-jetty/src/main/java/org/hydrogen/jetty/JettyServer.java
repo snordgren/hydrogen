@@ -1,4 +1,4 @@
-package jetty;
+package org.hydrogen.jetty;
 
 import org.eclipse.jetty.server.Server;
 

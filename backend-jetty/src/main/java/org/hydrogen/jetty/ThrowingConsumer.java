@@ -1,4 +1,4 @@
-package org.hydrogen.util;
+package org.hydrogen.jetty;
 
 @FunctionalInterface
 public interface ThrowingConsumer<T> {

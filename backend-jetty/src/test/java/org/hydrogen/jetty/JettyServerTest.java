@@ -1,4 +1,4 @@
-package jetty;
+package org.hydrogen.jetty;
 
 import com.mashape.unirest.http.Headers;
 import com.mashape.unirest.http.HttpResponse;

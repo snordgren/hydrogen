@@ -1,11 +1,10 @@
-package jetty;
+package org.hydrogen.jetty;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.hydrogen.Handler;
 import org.hydrogen.Servlet;
-import org.hydrogen.util.ThrowingConsumer;
 
 /**
  * Servlet runtime for using Jetty.
