@@ -73,7 +73,7 @@ public class Response {
                     statusCode,
                     headers,
                     contentType,
-                    text.getBytes());
+                    text.getBytes(UTF_8));
         }
 
         public Response html(String text) {
