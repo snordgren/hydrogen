@@ -8,7 +8,30 @@ import org.hydrogen.Servlet;
 import org.hydrogen.util.ExceptionUtils;
 import org.hydrogen.util.ThrowingConsumer;
 
+/**
+ * Servlet runtime for using Jetty.
+ */
 public class Jetty {
+    private static final int DEFAULT_PORT = 8080;
+
+    /**
+     * Starts a new server on the default port (8080) using a handler. Use
+     * http://localhost:8080 to access the server.
+     *
+     * @param handler Request handler.
+     * @return Server control interface object.
+     */
+    public static JettyServer start(Handler handler) {
+        return start(DEFAULT_PORT, handler);
+    }
+
+    /**
+     * Starts a new server on the specified port using a handler.
+     *
+     * @param port The port to listen to requests on.
+     * @param handler Request handler.
+     * @return Server control interface object.
+     */
     public static JettyServer start(int port, Handler handler) {
         Servlet servlet = new Servlet(handler);
         Server server = new Server(port);
@@ -20,6 +43,16 @@ public class Jetty {
         return new JettyServer(server);
     }
 
+    /**
+     * Utility method for starting a server using a handler, running a single
+     * function on it, and then stopping it. Useful for testing with a real
+     * server.
+     *
+     * @param port The port to launch the server on.
+     * @param handler The request handler.
+     * @param serverThrowingConsumer The code to run on this server, before
+     * stopping it.
+     */
     public static void use(int port, Handler handler,
             ThrowingConsumer<org.hydrogen.Server> serverThrowingConsumer) {
         JettyServer server = start(port, handler);
