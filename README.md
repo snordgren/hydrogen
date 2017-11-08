@@ -4,7 +4,7 @@ Hydrogen is a *single-function server* library; or in other words, an immutable,
 minimalistic HTTP abstraction mapping input requests to output responses. A basic
 server using Jetty as the backend can be created in just one line of code.
 
-	Jetty.start(request -> TextResponse.ok("Hello, world!"));
+	Jetty.start(request -> Response.ok().text("Hello, world!"));
 
 Hydrogen builds on a principle of type-safety and immutability, inspired by pure
 functional programming languages like Haskell. The main method of a Hydrogen server

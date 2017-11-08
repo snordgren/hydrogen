@@ -2,13 +2,10 @@ package jetty;
 
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.GetRequest;
-import org.hydrogen.HTMLResponse;
 import org.hydrogen.Handler;
-import org.hydrogen.JSONResponse;
 import org.hydrogen.RequestMethod;
+import org.hydrogen.Response;
 import org.hydrogen.Router;
-import org.hydrogen.TextResponse;
-import org.hydrogen.XMLResponse;
 import org.json.JSONArray;
 import org.junit.Test;
 
@@ -24,7 +21,7 @@ public class JettyServerTest {
         final String expected = "<h1>Hi!</h1>";
         Jetty.use(port, request -> {
             assertEquals(RequestMethod.GET, request.getMethod());
-            return HTMLResponse.ok(expected);
+            return Response.ok().html(expected);
         }, server -> {
             String result = Unirest.get(localhost).asString().getBody();
             assertEquals(expected, result);
@@ -35,7 +32,7 @@ public class JettyServerTest {
     public void testJSON() {
         int port = portCounter.next();
         String localhost = localhost(port);
-        Handler handler = request -> JSONResponse.ok("{ values: [1, 2, 3] }");
+        Handler handler = request -> Response.ok().json("{ values: [1, 2, 3] }");
         Jetty.use(port, handler, server -> {
             JSONArray values = Unirest.get(localhost).asJson().getBody().getObject()
                     .getJSONArray("values");
@@ -52,9 +49,9 @@ public class JettyServerTest {
         final String expected0 = "Ok: 0";
         final String expected1 = "Ok: 1";
         final String expectedNotFound = "404 Not Found";
-        Router router = Router.of(req -> TextResponse.notFound(expectedNotFound))
-                .get("/0", request -> TextResponse.ok(expected0))
-                .get("/1", request -> TextResponse.ok(expected1));
+        Router router = Router.of(req -> Response.notFound().text(expectedNotFound))
+                .get("/0", request -> Response.ok().text(expected0))
+                .get("/1", request -> Response.ok().text(expected1));
         Jetty.use(port, router, server -> {
             assertEquals(expected0, Unirest.post(localhost + "/0").asString().getBody());
             assertEquals(expected1, Unirest.post(localhost + "/1").asString().getBody());
@@ -70,7 +67,7 @@ public class JettyServerTest {
         final String expected = "Ok.";
         Jetty.use(port, request -> {
             assertEquals(RequestMethod.POST, request.getMethod());
-            return TextResponse.ok(expected);
+            return Response.ok().text(expected);
         }, server -> {
             assertEquals(expected, Unirest.post(localhost).asString().getBody());
         });
@@ -83,7 +80,9 @@ public class JettyServerTest {
         final String expected = "Hello, world!";
         Jetty.use(port, request -> {
             assertEquals(RequestMethod.GET, request.getMethod());
-            return TextResponse.ok(expected);
+            return Response.ok()
+                    .header("", "")
+                    .text(expected);
         }, server -> {
             GetRequest request = Unirest.get(localhost);
             System.out.println(request.getHeaders().size());
@@ -97,7 +96,7 @@ public class JettyServerTest {
         int port = portCounter.next();
         String localhost = localhost(port);
         final String expected = "<awful>truly</awful>";
-        Jetty.use(port, request -> XMLResponse.ok(expected), server -> {
+        Jetty.use(port, request -> Response.ok().xml(expected), server -> {
             assertEquals(expected, Unirest.get(localhost).asString().getBody());
         });
     }

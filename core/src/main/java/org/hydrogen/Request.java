@@ -1,17 +1,20 @@
 package org.hydrogen;
 
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.Map;
 
 public class Request {
     private final String url;
     private final RequestMethod method;
-    private final String[] headers;
+    private final Map<String, String> headers;
     private final InputStream body;
 
-    public Request(RequestMethod method, String url, String[] headers, InputStream body) {
+    public Request(RequestMethod method, String url, Map<String, String> headers,
+            InputStream body) {
         this.method = method;
         this.url = url;
-        this.headers = headers;
+        this.headers = Collections.unmodifiableMap(headers);
         this.body = body;
     }
 
@@ -19,7 +22,7 @@ public class Request {
         return body;
     }
 
-    public String[] getHeaders() {
+    public Map<String, String> getHeaders() {
         return headers;
     }
 

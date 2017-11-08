@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Servlet extends HttpServlet {
     private final Handler handler;
@@ -20,12 +22,18 @@ public class Servlet extends HttpServlet {
         this.handler = handler;
     }
 
-    private String[] extractHeaders(Enumeration<String> headers) {
-        List<String> headerList = new ArrayList<>();
-        while (headers.hasMoreElements()) {
-            headerList.add(headers.nextElement());
+    private Map<String, String> extractHeaders(HttpServletRequest req) {
+        Enumeration<String> headerNames = req.getHeaderNames();
+        List<String> headerNameList = new ArrayList<>();
+        while (headerNames.hasMoreElements()) {
+            headerNameList.add(headerNames.nextElement());
         }
-        return headerList.toArray(new String[headerList.size()]);
+        Map<String, String> headerMap = new HashMap<>();
+        headerNameList.forEach(headerName -> {
+            String value = req.getHeader(headerName);
+            headerMap.put(headerName, value);
+        });
+        return headerMap;
     }
 
     private String appendQueryString(String url, String queryString) {
@@ -39,58 +47,20 @@ public class Servlet extends HttpServlet {
             throws ServletException, IOException {
         RequestMethod method = RequestMethod.valueOf(req.getMethod());
         String url = appendQueryString(req.getRequestURI(), req.getQueryString());
-        String[] headers = extractHeaders(req.getHeaderNames());
+        Map<String, String> headers = extractHeaders(req);
         InputStream body = req.getInputStream();
         Request request = new Request(method, url, headers, body);
         Response response = handler.handle(request);
-        response.accept(new ResponseBodyWriter(resp));
+        resp.setContentType(response.getContentType().getText());
+        resp.setStatus(response.getStatusCode().getNumber());
+        if (response.getBody().length > 0) {
+            ExceptionUtils.run(() -> {
+                ServletOutputStream out = resp.getOutputStream();
+                out.write(response.getBody());
+                out.flush();
+                out.close();
+            });
+        }
+        response.getHeaders().forEach(resp::setHeader);
     }
-
-    /**
-     * Converts a Hydrogen response into a HttpServletResponse.
-     *
-     * @author Silas Nordgren
-     */
-    private static class ResponseBodyWriter implements ResponseAdapter<HttpServletResponse> {
-        private final HttpServletResponse servletResponse;
-
-        public ResponseBodyWriter(HttpServletResponse servletResponse) {
-            this.servletResponse = servletResponse;
-        }
-
-        @Override
-        public HttpServletResponse html(HTMLResponse response) {
-            return writeTextualResponse(response);
-        }
-
-        @Override
-        public HttpServletResponse json(JSONResponse response) {
-            return writeTextualResponse(response);
-        }
-
-        @Override
-        public HttpServletResponse text(TextResponse response) {
-            return writeTextualResponse(response);
-        }
-
-        private HttpServletResponse writeTextualResponse(TextualResponse response) {
-            servletResponse.setContentType(response.getContentType().getText());
-            servletResponse.setStatus(response.getStatusCode().getNumber());
-            if (response.getBytes().length > 0) {
-                ExceptionUtils.run(() -> {
-                    ServletOutputStream out = servletResponse.getOutputStream();
-                    out.write(response.getBytes());
-                    out.flush();
-                    out.close();
-                });
-            }
-            return servletResponse;
-        }
-
-        @Override
-        public HttpServletResponse xml(XMLResponse response) {
-            return writeTextualResponse(response);
-        }
-    }
-
 }
