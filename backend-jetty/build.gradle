@@ -1,0 +1,12 @@
+description = "A Jetty backend for Hydrogen HTTP."
+
+buildscript {
+    ext.jettyVersion = "9.4.6.v20170531"
+}
+
+dependencies {
+    compile project(":core")
+    compile "org.eclipse.jetty:jetty-server:$jettyVersion"
+    compile "org.eclipse.jetty:jetty-servlet:$jettyVersion"
+    testCompile "com.mashape.unirest:unirest-java:1.4.9"
+}

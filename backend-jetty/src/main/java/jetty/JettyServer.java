@@ -1,4 +1,4 @@
-package org.hydrogen.jetty;
+package jetty;
 
 import org.eclipse.jetty.server.Server;
 import org.hydrogen.util.ExceptionUtils;

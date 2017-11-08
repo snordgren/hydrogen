@@ -1,0 +1,5 @@
+description = "A server-as-a-function library for Java."
+
+dependencies {
+    compileOnly "javax.servlet:javax.servlet-api:4.0.0"
+}

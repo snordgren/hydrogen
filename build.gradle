@@ -1,21 +1,16 @@
 group 'org.hydrogen'
 version '1.0-SNAPSHOT'
 
-apply plugin: 'java'
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
 
-sourceCompatibility = 1.8
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
 
-buildscript {
-    ext.jettyVersion = "9.4.6.v20170531"
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    compile "org.eclipse.jetty:jetty-server:$jettyVersion"
-    compile "org.eclipse.jetty:jetty-servlet:$jettyVersion"
-    testCompile "junit:junit:4.12"
-    testCompile "com.mashape.unirest:unirest-java:1.4.9"
+    dependencies {
+        testCompile "junit:junit:4.12"
+    }
 }
