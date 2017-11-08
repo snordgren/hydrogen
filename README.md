@@ -1,8 +1,8 @@
 # Hydrogen
 
-Hydrogen is a *single-function server* library; or in other words, an immutable,
-minimalistic HTTP abstraction mapping input requests to output responses. A basic
-server using Jetty as the backend can be created in just one line of code.
+Hydrogen is a *server as a function* library: an immutable, minimal HTTP
+function mapping input requests to output responses. A basic server using
+Jetty as the backend can be created in just one line of code.
 
 	Jetty.start(request -> Response.ok().text("Hello, world!"));
 
