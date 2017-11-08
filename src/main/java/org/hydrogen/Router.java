@@ -26,7 +26,7 @@ public class Router implements Handler {
     @Override
     public Response handle(Request request) {
         Handler handler = routes.keySet().stream()
-                .filter(route -> route.equalsIgnoreCase(request.getPath()))
+                .filter(route -> route.equalsIgnoreCase(request.getUrl()))
                 .findAny()
                 .map(routes::get)
                 .orElse(notFoundHandler);

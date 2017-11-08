@@ -6,10 +6,10 @@ import org.hydrogen.ResponseAdapter;
 import org.hydrogen.TextResponse;
 import org.hydrogen.TextualResponse;
 import org.hydrogen.XMLResponse;
+import org.hydrogen.util.ExceptionUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 /**
  * Converts a Hydrogen response into a HttpServletResponse.
@@ -23,39 +23,37 @@ public class ResponseAdapterImpl implements ResponseAdapter<HttpServletResponse>
         this.servletResponse = servletResponse;
     }
 
-    private HttpServletResponse content(TextualResponse response) {
+    @Override
+    public HttpServletResponse html(HTMLResponse response) {
+        return writeTextualResponse(response);
+    }
+
+    @Override
+    public HttpServletResponse json(JSONResponse response) {
+        return writeTextualResponse(response);
+    }
+
+    @Override
+    public HttpServletResponse text(TextResponse response) {
+        return writeTextualResponse(response);
+    }
+
+    private HttpServletResponse writeTextualResponse(TextualResponse response) {
         servletResponse.setContentType(response.getContentType().getText());
         servletResponse.setStatus(response.getStatusCode().getNumber());
         if (response.getBytes().length > 0) {
-            try {
+            ExceptionUtils.run(() -> {
                 ServletOutputStream out = servletResponse.getOutputStream();
                 out.write(response.getBytes());
                 out.flush();
                 out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            });
         }
         return servletResponse;
     }
 
     @Override
-    public HttpServletResponse html(HTMLResponse response) {
-        return content(response);
-    }
-
-    @Override
-    public HttpServletResponse json(JSONResponse response) {
-        return content(response);
-    }
-
-    @Override
-    public HttpServletResponse text(TextResponse response) {
-        return content(response);
-    }
-
-    @Override
     public HttpServletResponse xml(XMLResponse response) {
-        return content(response);
+        return writeTextualResponse(response);
     }
 }

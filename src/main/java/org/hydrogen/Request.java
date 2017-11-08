@@ -1,19 +1,33 @@
 package org.hydrogen;
 
-public class Request {
-    private final String path;
-    private final RequestMethod method;
+import java.io.InputStream;
 
-    public Request(RequestMethod method, String path) {
+public class Request {
+    private final String url;
+    private final RequestMethod method;
+    private final String[] headers;
+    private final InputStream body;
+
+    public Request(RequestMethod method, String url, String[] headers, InputStream body) {
         this.method = method;
-        this.path = path;
+        this.url = url;
+        this.headers = headers;
+        this.body = body;
+    }
+
+    public InputStream getBody() {
+        return body;
+    }
+
+    public String[] getHeaders() {
+        return headers;
     }
 
     public RequestMethod getMethod() {
         return method;
     }
 
-    public String getPath() {
-        return path;
+    public String getUrl() {
+        return url;
     }
 }
