@@ -5,7 +5,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.hydrogen.Handler;
 import org.hydrogen.Servlet;
-import org.hydrogen.util.ExceptionUtils;
 import org.hydrogen.util.ThrowingConsumer;
 
 /**
@@ -39,7 +38,11 @@ public class Jetty {
                 ServletContextHandler.SESSIONS);
         servletContextHandler.addServlet(new ServletHolder(servlet), "/*");
         server.insertHandler(servletContextHandler);
-        ExceptionUtils.run(server::start);
+        try {
+            server.start();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return new JettyServer(server);
     }
 
@@ -56,7 +59,11 @@ public class Jetty {
     public static void use(int port, Handler handler,
             ThrowingConsumer<org.hydrogen.Server> serverThrowingConsumer) {
         JettyServer server = start(port, handler);
-        ExceptionUtils.run(() -> serverThrowingConsumer.acceptThrows(server));
+        try {
+            serverThrowingConsumer.acceptThrows(server);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         server.stop();
     }
 }

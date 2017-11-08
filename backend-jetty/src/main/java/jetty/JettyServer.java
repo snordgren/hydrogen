@@ -1,7 +1,6 @@
 package jetty;
 
 import org.eclipse.jetty.server.Server;
-import org.hydrogen.util.ExceptionUtils;
 
 public class JettyServer implements org.hydrogen.Server {
     private final Server server;
@@ -12,11 +11,19 @@ public class JettyServer implements org.hydrogen.Server {
 
     @Override
     public void join() {
-        ExceptionUtils.run(server::join);
+        try {
+            server.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public void stop() {
-        ExceptionUtils.run(server::stop);
+        try {
+            server.stop();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

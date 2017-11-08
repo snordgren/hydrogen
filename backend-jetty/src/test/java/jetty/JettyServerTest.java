@@ -1,5 +1,8 @@
 package jetty;
 
+import com.mashape.unirest.http.Headers;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.GetRequest;
 import org.hydrogen.Handler;
@@ -81,11 +84,9 @@ public class JettyServerTest {
         Jetty.use(port, request -> {
             assertEquals(RequestMethod.GET, request.getMethod());
             return Response.ok()
-                    .header("", "")
                     .text(expected);
         }, server -> {
             GetRequest request = Unirest.get(localhost);
-            System.out.println(request.getHeaders().size());
             String result = request.asString().getBody();
             assertEquals(expected, result);
         });
@@ -98,6 +99,23 @@ public class JettyServerTest {
         final String expected = "<awful>truly</awful>";
         Jetty.use(port, request -> Response.ok().xml(expected), server -> {
             assertEquals(expected, Unirest.get(localhost).asString().getBody());
+        });
+    }
+
+    @Test
+    public void testHeader() {
+        int port = 8080;
+        String localhost = localhost(port);
+        String header = "Cache-Control";
+        String expected = "max-age=3600";
+
+        Jetty.use(port, request -> Response.ok()
+                .header(header, expected)
+                .text("{}"), server -> {
+            GetRequest request = Unirest.get(localhost);
+            HttpResponse<JsonNode> response = request.asJson();
+            Headers headers = response.getHeaders();
+            assertEquals(expected, headers.getFirst(header));
         });
     }
 

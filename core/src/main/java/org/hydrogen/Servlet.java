@@ -1,7 +1,5 @@
 package org.hydrogen;
 
-import org.hydrogen.util.ExceptionUtils;
-
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -51,16 +49,16 @@ public class Servlet extends HttpServlet {
         InputStream body = req.getInputStream();
         Request request = new Request(method, url, headers, body);
         Response response = handler.handle(request);
+        response.getHeaders().forEach(resp::addHeader);
         resp.setContentType(response.getContentType().getText());
         resp.setStatus(response.getStatusCode().getNumber());
+
+        // NOTE: Once we start writing to the body, we can no longer add headers.
         if (response.getBody().length > 0) {
-            ExceptionUtils.run(() -> {
-                ServletOutputStream out = resp.getOutputStream();
-                out.write(response.getBody());
-                out.flush();
-                out.close();
-            });
+            ServletOutputStream out = resp.getOutputStream();
+            out.write(response.getBody());
+            out.flush();
+            out.close();
         }
-        response.getHeaders().forEach(resp::setHeader);
     }
 }
