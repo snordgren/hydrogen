@@ -52,14 +52,16 @@ public class JettyServerTest {
         final String expected0 = "Ok: 0";
         final String expected1 = "Ok: 1";
         final String expectedNotFound = "404 Not Found";
-        Router router = Router.of(req -> Response.notFound().text(expectedNotFound))
+        Router router = Router.builder()
+                .notFound(req -> Response.notFound().text(expectedNotFound))
                 .get("/0", request -> Response.ok().text(expected0))
-                .get("/1", request -> Response.ok().text(expected1));
+                .get("/1", request -> Response.ok().text(expected1))
+                .build();
         Jetty.use(port, router, server -> {
-            assertEquals(expected0, Unirest.post(localhost + "/0").asString().getBody());
-            assertEquals(expected1, Unirest.post(localhost + "/1").asString().getBody());
+            assertEquals(expected0, Unirest.get(localhost + "/0").asString().getBody());
+            assertEquals(expected1, Unirest.get(localhost + "/1").asString().getBody());
             assertEquals(expectedNotFound,
-                    Unirest.post(localhost + "/2").asString().getBody());
+                    Unirest.get(localhost + "/2").asString().getBody());
         });
     }
 

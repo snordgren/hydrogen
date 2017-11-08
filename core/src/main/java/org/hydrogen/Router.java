@@ -1,39 +1,67 @@
 package org.hydrogen;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
-public class Router implements Handler {
-    private final Map<String, Handler> routes;
-    private final Handler notFoundHandler;
+public final class Router implements Handler {
+    private final List<Route> routes;
+    private final Handler notFound;
 
-    private Router(Handler notFoundHandler) {
-        this(notFoundHandler, new HashMap<>());
-    }
-
-    private Router(Handler notFoundHandler, Map<String, Handler> routes) {
-        this.notFoundHandler = notFoundHandler;
+    private Router(Handler notFound, List<Route> routes) {
+        this.notFound = notFound;
         this.routes = routes;
     }
 
-    public Router get(String route, Handler handler) {
-        Map<String, Handler> newMap = new HashMap<>();
-        newMap.putAll(routes);
-        newMap.put(route, handler);
-        return new Router(notFoundHandler, newMap);
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Override
     public Response handle(Request request) {
-        Handler handler = routes.keySet().stream()
-                .filter(route -> route.equalsIgnoreCase(request.getUrl()))
-                .findAny()
-                .map(routes::get)
-                .orElse(notFoundHandler);
-        return handler.handle(request);
+        for (Route route : routes) {
+            if (route.getPredicate().test(request)) {
+                return route.getHandler().handle(request);
+            }
+        }
+        return notFound.handle(request);
     }
 
-    public static Router of(Handler handler) {
-        return new Router(handler);
+    private boolean isRouteMatch(String route, String url) {
+        return route.equalsIgnoreCase(url);
+    }
+
+    public static final class Builder {
+        private final List<Route> routes = new ArrayList<>();
+        private Handler notFound;
+
+        public Router build() {
+            return new Router(notFound, routes);
+        }
+
+        public Builder get(String url, Handler handler) {
+            routes.add(Route.match(RequestMethod.GET, url, handler));
+            return this;
+        }
+
+        public Builder group(String url, Handler handler) {
+            Predicate<Request> predicate = req -> req.getUrl().startsWith(url);
+            Handler modifiedHandler = req -> {
+                String newUrl = req.getUrl().substring(url.length());
+                return handler.handle(req.withUrl(newUrl));
+            };
+            routes.add(new Route(predicate, modifiedHandler));
+            return this;
+        }
+
+        public Builder notFound(Handler notFound) {
+            this.notFound = notFound;
+            return this;
+        }
+
+        public Builder post(String url, Handler handler) {
+            routes.add(Route.match(RequestMethod.POST, url, handler));
+            return this;
+        }
     }
 }

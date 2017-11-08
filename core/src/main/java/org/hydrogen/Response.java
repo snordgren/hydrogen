@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * @author Silas Nordgren
  */
-public class Response {
+public final class Response {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private final StatusCode statusCode;
     private final Map<String, String> headers;
@@ -29,6 +29,10 @@ public class Response {
 
     public byte[] getBody() {
         return body;
+    }
+
+    public String getBodyAsString() {
+        return new String(getBody(), UTF_8);
     }
 
     public ContentType getContentType() {
@@ -55,7 +59,7 @@ public class Response {
         return new Builder(statusCode);
     }
 
-    public static class Builder {
+    public static final class Builder {
         private final StatusCode statusCode;
         private final Map<String, String> headers = new HashMap<>();
 
