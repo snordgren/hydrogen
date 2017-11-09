@@ -1,5 +1,7 @@
 package org.hydrogen;
 
+import java.util.Optional;
+
 public enum ContentType {
     BMP("image/bmp", "bmp"),
     CSS("text/css; charset=utf-8", "css"),
@@ -34,15 +36,15 @@ public enum ContentType {
         return text;
     }
 
-    public static ContentType of(String extension) {
+    public static Optional<ContentType> of(String extension) {
         for (ContentType contentType : values()) {
             for (String contentExt : contentType.extensions) {
                 if (contentExt.equalsIgnoreCase(extension)) {
-                    return contentType;
+                    return Optional.of(contentType);
                 }
             }
         }
 
-        throw new RuntimeException("No extension found for type " + extension + ".");
+        return Optional.empty();
     }
 }

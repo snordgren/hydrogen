@@ -58,7 +58,9 @@ public final class Router implements Handler {
                         byte[] bytes = staticDirectory.load(filePath);
                         String[] pathParts = filePath.split("\\.");
                         String extension = pathParts[pathParts.length - 1];
-                        ContentType contentType = ContentType.of(extension);
+                        ContentType contentType = ContentType.of(extension)
+                                .orElseThrow(() -> new RuntimeException(
+                                        "Could not get content type of " + filePath + "."));
                         return Optional.of(Response.ok().body(contentType, bytes));
                     } else return Optional.empty();
                 } else return Optional.empty();
