@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,7 +61,8 @@ public class Servlet extends HttpServlet {
 
     private Request buildHydrogenRequest(HttpServletRequest req) throws IOException {
         RequestMethod method = RequestMethod.valueOf(req.getMethod());
-        String url = appendQueryString(req.getRequestURI(), req.getQueryString());
+        String url = req.getRequestURI();
+        Map<String, String> queryParams = buildQueryParamMap(req.getQueryString());
         Map<String, String> headers = extractEnumMap(req.getHeaderNames(),
                 req::getHeader);
         InputStream body = req.getInputStream();
@@ -75,13 +77,29 @@ public class Servlet extends HttpServlet {
                 httpSession.isNew(),
                 true,
                 sessionAttributes);
-        return new Request(method, url, headers, body, session);
+        return new Request(method, url, queryParams, headers, body, session);
     }
 
-    private String appendQueryString(String url, String queryString) {
-        if (queryString != null && !queryString.isEmpty()) {
-            return "?" + queryString;
-        } else return url;
+    private Map<String, String> buildQueryParamMap(String str) {
+        if (str == null || str.isEmpty()) {
+            return Collections.emptyMap();
+        } else {
+            if (str.startsWith("&")) {
+                str = str.substring(1);
+            }
+            Map<String, String> map = new HashMap<>();
+            String[] assignments = str.split("&");
+            for (String assignment : assignments) {
+                String[] parts = assignment.split("=");
+                String key = parts[0];
+                String value = parts[1];
+
+                // TODO Handle what happens if the length is invalid.
+
+                map.put(key, value);
+            }
+            return map;
+        }
     }
 
     @Override

@@ -7,19 +7,24 @@ import java.util.Map;
 public class Request {
     private final String url;
     private final RequestMethod method;
-    private final Map<String, String> headers;
+    private final Map<String, String> queryParams, headers;
     private final InputStream body;
     private final Session session;
 
     public Request(RequestMethod method, String url) {
-        this(method, url, Collections.emptyMap(), null, Session.empty());
+        this(method, url, Collections.emptyMap(), Collections.emptyMap(),
+                null, Session.empty());
     }
 
-    public Request(RequestMethod method, String url, Map<String, String> headers,
+    public Request(RequestMethod method,
+            String url,
+            Map<String, String> queryParams,
+            Map<String, String> headers,
             InputStream body,
             Session session) {
         this.method = method;
         this.url = url;
+        this.queryParams = Collections.unmodifiableMap(queryParams);
         this.headers = Collections.unmodifiableMap(headers);
         this.body = body;
         this.session = session;
@@ -27,6 +32,18 @@ public class Request {
 
     public InputStream getBody() {
         return body;
+    }
+
+    public String getQueryParam(String name) {
+        return getQueryParams().get(name);
+    }
+
+    public Map<String, String> getQueryParams() {
+        return queryParams;
+    }
+
+    public String getHeader(String name) {
+        return getHeaders().get(name);
     }
 
     public Map<String, String> getHeaders() {
@@ -54,7 +71,7 @@ public class Request {
     }
 
     public Request withUrl(String url) {
-        return new Request(method, url, headers, body, session);
+        return new Request(method, url, queryParams, headers, body, session);
     }
 
     @Override

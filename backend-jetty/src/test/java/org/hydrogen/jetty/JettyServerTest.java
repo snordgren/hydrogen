@@ -14,6 +14,7 @@ import org.json.JSONArray;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class JettyServerTest {
     private static final Counter portCounter = new Counter(8000);
@@ -141,6 +142,20 @@ public class JettyServerTest {
             assertEquals("2", Unirest.post(localhost).asString().getBody());
             assertEquals("3", Unirest.post(localhost).asString().getBody());
         });
+    }
+
+    @Test
+    public void testQueryParams() {
+        int port = portCounter.next();
+        String localhost = localhost(port) + "?name=Me&password=1234&pin=9999";
+        Jetty.use(port, request -> {
+            assertEquals("/", request.getUrl());
+            assertFalse(request.getQueryParams().isEmpty());
+            assertEquals("Me", request.getQueryParam("name"));
+            assertEquals("1234", request.getQueryParam("password"));
+            assertEquals("9999", request.getQueryParam("pin"));
+            return Response.ok().text("Success!");
+        }, server -> Unirest.post(localhost).asString());
     }
 
     private static String localhost(int port) {
