@@ -59,7 +59,6 @@ public final class Router implements Handler {
                 if (req.getUrl().startsWith(path)) {
                     String filePath = removePath(path, req.getUrl());
                     if (staticDirectory.isPathValid(filePath) && filePath.contains(".")) {
-                        System.out.println("Here.");
                         byte[] bytes = staticDirectory.load(filePath);
                         String[] pathParts = filePath.split("\\.");
                         String extension = pathParts[pathParts.length - 1];
