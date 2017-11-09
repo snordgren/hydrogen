@@ -56,12 +56,30 @@ public final class Response {
         return statusCode;
     }
 
+    public static Builder found() {
+        return status(StatusCode.FOUND);
+    }
+
     public static Builder notFound() {
         return status(StatusCode.NOT_FOUND);
     }
 
+    public static Builder movedPermanently() {
+        return status(StatusCode.MOVED_PERMANENTLY);
+    }
+
     public static Builder ok() {
         return status(StatusCode.OK);
+    }
+
+    public static Response redirect(String url) {
+        return redirect(url, StatusCode.FOUND);
+    }
+
+    public static Response redirect(String url, StatusCode statusCode) {
+        return status(statusCode)
+                .header("Location", url)
+                .emptyBody();
     }
 
     public static Builder status(StatusCode statusCode) {
@@ -90,6 +108,15 @@ public final class Response {
                     headers,
                     contentType,
                     text.getBytes(UTF_8),
+                    Optional.ofNullable(session));
+        }
+
+        public Response emptyBody() {
+            return new Response(
+                    statusCode,
+                    headers,
+                    ContentType.HTML,
+                    new byte[0],
                     Optional.ofNullable(session));
         }
 
