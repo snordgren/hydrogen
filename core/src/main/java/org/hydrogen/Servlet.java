@@ -5,13 +5,15 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 public class Servlet extends HttpServlet {
     private final Handler handler;
@@ -20,18 +22,60 @@ public class Servlet extends HttpServlet {
         this.handler = handler;
     }
 
-    private Map<String, String> extractHeaders(HttpServletRequest req) {
-        Enumeration<String> headerNames = req.getHeaderNames();
-        List<String> headerNameList = new ArrayList<>();
-        while (headerNames.hasMoreElements()) {
-            headerNameList.add(headerNames.nextElement());
+    private void applyResponseSession(Session session, HttpSession httpSession) {
+        if (!session.isValid()) {
+            httpSession.invalidate();
         }
-        Map<String, String> headerMap = new HashMap<>();
-        headerNameList.forEach(headerName -> {
-            String value = req.getHeader(headerName);
-            headerMap.put(headerName, value);
+
+        Set<String> attrNames = session.getAttributeNames();
+        Set<String> presentNames = extractEnumSet(httpSession.getAttributeNames());
+        presentNames.forEach(name -> {
+            if (!attrNames.contains(name)) {
+                httpSession.removeAttribute(name);
+            }
         });
-        return headerMap;
+        attrNames.forEach(name ->
+                httpSession.setAttribute(name, session.getAttribute(name)));
+    }
+
+    private <T> Map<String, T> extractEnumMap(
+            Enumeration<String> enumeration,
+            Function<String, T> accessor) {
+        Map<String, T> map = new HashMap<>();
+        while (enumeration.hasMoreElements()) {
+            String name = enumeration.nextElement();
+            T value = accessor.apply(name);
+            map.put(name, value);
+        }
+        return map;
+    }
+
+    private Set<String> extractEnumSet(Enumeration<String> enumeration) {
+        Set<String> set = new HashSet<>();
+        while (enumeration.hasMoreElements()) {
+            set.add(enumeration.nextElement());
+        }
+        return set;
+    }
+
+    private Request buildHydrogenRequest(HttpServletRequest req) throws IOException {
+        RequestMethod method = RequestMethod.valueOf(req.getMethod());
+        String url = appendQueryString(req.getRequestURI(), req.getQueryString());
+        Map<String, String> headers = extractEnumMap(req.getHeaderNames(),
+                req::getHeader);
+        InputStream body = req.getInputStream();
+
+        HttpSession httpSession = req.getSession();
+        Map<String, Object> sessionAttributes = extractEnumMap(
+                httpSession.getAttributeNames(),
+                httpSession::getAttribute);
+
+        Session session = new Session(
+                httpSession.getId(),
+                httpSession.isNew(),
+                true,
+                sessionAttributes);
+        return new Request(method, url, headers, body, session);
     }
 
     private String appendQueryString(String url, String queryString) {
@@ -43,12 +87,11 @@ public class Servlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        RequestMethod method = RequestMethod.valueOf(req.getMethod());
-        String url = appendQueryString(req.getRequestURI(), req.getQueryString());
-        Map<String, String> headers = extractHeaders(req);
-        InputStream body = req.getInputStream();
-        Request request = new Request(method, url, headers, body);
+        Request request = buildHydrogenRequest(req);
         Response response = handler.handle(request);
+        response.getSession().ifPresent(session ->
+                applyResponseSession(session, req.getSession()));
+
         response.getHeaders().forEach(resp::addHeader);
         resp.setContentType(response.getContentType().getText());
         resp.setStatus(response.getStatusCode().getNumber());

@@ -9,17 +9,20 @@ public class Request {
     private final RequestMethod method;
     private final Map<String, String> headers;
     private final InputStream body;
+    private final Session session;
 
     public Request(RequestMethod method, String url) {
-        this(method, url, Collections.emptyMap(), null);
+        this(method, url, Collections.emptyMap(), null, Session.empty());
     }
 
     public Request(RequestMethod method, String url, Map<String, String> headers,
-            InputStream body) {
+            InputStream body,
+            Session session) {
         this.method = method;
         this.url = url;
         this.headers = Collections.unmodifiableMap(headers);
         this.body = body;
+        this.session = session;
     }
 
     public InputStream getBody() {
@@ -32,6 +35,10 @@ public class Request {
 
     public RequestMethod getMethod() {
         return method;
+    }
+
+    public Session getSession() {
+        return session;
     }
 
     public String getUrl() {
@@ -47,7 +54,7 @@ public class Request {
     }
 
     public Request withUrl(String url) {
-        return new Request(method, url, headers, body);
+        return new Request(method, url, headers, body, session);
     }
 
     @Override

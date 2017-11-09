@@ -9,6 +9,7 @@ import org.hydrogen.Handler;
 import org.hydrogen.RequestMethod;
 import org.hydrogen.Response;
 import org.hydrogen.Router;
+import org.hydrogen.Session;
 import org.json.JSONArray;
 import org.junit.Test;
 
@@ -106,7 +107,7 @@ public class JettyServerTest {
 
     @Test
     public void testHeader() {
-        int port = 8080;
+        int port = portCounter.next();
         String localhost = localhost(port);
         String header = "Cache-Control";
         String expected = "max-age=3600";
@@ -118,6 +119,27 @@ public class JettyServerTest {
             HttpResponse<JsonNode> response = request.asJson();
             Headers headers = response.getHeaders();
             assertEquals(expected, headers.getFirst(header));
+        });
+    }
+
+    @Test
+    public void testSession() {
+        int port = portCounter.next();
+        String localhost = localhost(port);
+        Jetty.use(port, request -> {
+            Session session = request.getSession();
+            int timesVisited;
+            if (session.hasAttribute("TimesVisited")) {
+                timesVisited = (Integer) session.getAttribute("TimesVisited") + 1;
+            } else timesVisited = 1;
+            Session newSession = session.withAttribute("TimesVisited", timesVisited);
+            return Response.ok()
+                    .session(newSession)
+                    .text(newSession.getAttribute("TimesVisited").toString());
+        }, server -> {
+            assertEquals("1", Unirest.post(localhost).asString().getBody());
+            assertEquals("2", Unirest.post(localhost).asString().getBody());
+            assertEquals("3", Unirest.post(localhost).asString().getBody());
         });
     }
 

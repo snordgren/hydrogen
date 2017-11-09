@@ -4,6 +4,8 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Immutable, type-safe representation of an HTTP response.
@@ -13,6 +15,7 @@ import java.util.Map;
 public final class Response {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
     private final StatusCode statusCode;
+    private final Optional<Session> session;
     private final Map<String, String> headers;
     private final ContentType contentType;
     private final byte[] body;
@@ -20,11 +23,13 @@ public final class Response {
     private Response(StatusCode statusCode,
             Map<String, String> headers,
             ContentType contentType,
-            byte[] body) {
+            byte[] body,
+            Optional<Session> session) {
         this.statusCode = statusCode;
         this.headers = Collections.unmodifiableMap(headers);
         this.contentType = contentType;
         this.body = body;
+        this.session = session;
     }
 
     public byte[] getBody() {
@@ -41,6 +46,10 @@ public final class Response {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public Optional<Session> getSession() {
+        return session;
     }
 
     public StatusCode getStatusCode() {
@@ -62,12 +71,15 @@ public final class Response {
     public static final class Builder {
         private final StatusCode statusCode;
         private final Map<String, String> headers = new HashMap<>();
+        private Session session = null;
 
         public Builder(StatusCode statusCode) {
             this.statusCode = statusCode;
         }
 
         public Builder header(String name, String value) {
+            Objects.requireNonNull(name);
+            Objects.requireNonNull(value);
             headers.put(name, value);
             return this;
         }
@@ -77,7 +89,8 @@ public final class Response {
                     statusCode,
                     headers,
                     contentType,
-                    text.getBytes(UTF_8));
+                    text.getBytes(UTF_8),
+                    Optional.ofNullable(session));
         }
 
         public Response html(String text) {
@@ -86,6 +99,12 @@ public final class Response {
 
         public Response json(String text) {
             return createTextResponse(ContentType.JSON, text);
+        }
+
+        public Builder session(Session session) {
+            Objects.requireNonNull(session);
+            this.session = session;
+            return this;
         }
 
         public Response text(String text) {
