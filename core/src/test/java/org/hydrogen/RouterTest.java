@@ -32,4 +32,15 @@ public class RouterTest {
         Response response = router.handle(new Request(RequestMethod.GET, "/user/"));
         assertEquals(expected, response.getBodyAsString());
     }
+
+    @Test
+    public void testStaticFiles() {
+        String expectedContents = "Lorem ipsum dolor sit amet.";
+        Router router = Router.builder()
+                .bind("public", new ClasspathDirectory(""))
+                .build();
+        Request request = new Request(RequestMethod.GET, "/public/TestFile.txt");
+        Response response = router.handle(request);
+        assertEquals(expectedContents, response.getBodyAsString());
+    }
 }

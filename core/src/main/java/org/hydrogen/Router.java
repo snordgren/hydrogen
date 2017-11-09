@@ -35,6 +35,41 @@ public final class Router implements Handler {
         private final List<Route> routes = new ArrayList<>();
         private Handler notFound;
 
+        private static String requireSlashEnclosed(String s) {
+            String enclosure = "/";
+            StringBuilder b = new StringBuilder();
+            if (!s.startsWith(enclosure)) {
+                b.append(enclosure);
+            }
+            b.append(s);
+            if (!s.endsWith(enclosure)) {
+                b.append(enclosure);
+            }
+            return b.toString();
+        }
+
+        private String removePath(String path, String str) {
+            return str.substring(path.length());
+        }
+
+        public Builder bind(String passedPath, StaticDirectory staticDirectory) {
+            String path = requireSlashEnclosed(passedPath);
+            Route route = new Route(req -> req.getUrl().startsWith(path) &&
+                    staticDirectory.isPathValid(removePath(path, req.getUrl())),
+                    req -> {
+                        String filePath = removePath(path, req.getUrl());
+                        if (staticDirectory.isPathValid(filePath)) {
+                            byte[] bytes = staticDirectory.load(filePath);
+                            String[] pathParts = filePath.split("\\.");
+                            String extension = pathParts[pathParts.length - 1];
+                            ContentType contentType = ContentType.of(extension);
+                            return Response.ok().body(contentType, bytes);
+                        } else return Response.notFound().text("404 Not Found");
+                    });
+            routes.add(route);
+            return this;
+        }
+
         public Router build() {
             return new Router(notFound, routes);
         }

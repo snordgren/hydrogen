@@ -102,6 +102,15 @@ public final class Response {
             return this;
         }
 
+        public Response body(ContentType contentType, byte[] body) {
+            return new Response(
+                    statusCode,
+                    headers,
+                    contentType,
+                    body,
+                    Optional.ofNullable(session));
+        }
+
         private Response createTextResponse(ContentType contentType, String text) {
             return new Response(
                     statusCode,
