@@ -28,10 +28,6 @@ public final class Router implements Handler {
         return notFound.handle(request);
     }
 
-    private boolean isRouteMatch(String route, String url) {
-        return route.equalsIgnoreCase(url);
-    }
-
     public static final class Builder {
         private final List<Route> routes = new ArrayList<>();
         private Handler notFound;
@@ -56,14 +52,15 @@ public final class Router implements Handler {
         public Builder bind(String passedPath, StaticDirectory staticDirectory) {
             String path = requireSlashEnclosed(passedPath);
             Route route = req -> {
-                String filePath = removePath(path, req.getUrl());
-                if (req.getUrl().startsWith(path) &&
-                        staticDirectory.isPathValid(filePath)) {
-                    byte[] bytes = staticDirectory.load(filePath);
-                    String[] pathParts = filePath.split("\\.");
-                    String extension = pathParts[pathParts.length - 1];
-                    ContentType contentType = ContentType.of(extension);
-                    return Optional.of(Response.ok().body(contentType, bytes));
+                if (req.getUrl().startsWith(path)) {
+                    String filePath = removePath(path, req.getUrl());
+                    if (staticDirectory.isPathValid(filePath)) {
+                        byte[] bytes = staticDirectory.load(filePath);
+                        String[] pathParts = filePath.split("\\.");
+                        String extension = pathParts[pathParts.length - 1];
+                        ContentType contentType = ContentType.of(extension);
+                        return Optional.of(Response.ok().body(contentType, bytes));
+                    } else return Optional.empty();
                 } else return Optional.empty();
             };
             routes.add(route);

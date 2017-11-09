@@ -43,4 +43,14 @@ public class RouterTest {
         Response response = router.handle(request);
         assertEquals(expectedContents, response.getBodyAsString());
     }
+
+    @Test
+    public void testLocalhost() {
+        Router router = Router.builder()
+                .bind("/public", new ClasspathDirectory(""))
+                .get("wonderfully/long", request -> Response.ok().text("No."))
+                .get("", request -> Response.ok().text("Yes."))
+                .build();
+        router.handle(new Request(RequestMethod.GET, ""));
+    }
 }
