@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ClasspathDirectory extends AbstractStaticDirectory {
+public final class ClasspathDirectory extends AbstractStaticDirectory {
     public ClasspathDirectory(String directory) {
         super(directory);
     }

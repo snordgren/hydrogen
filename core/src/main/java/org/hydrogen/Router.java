@@ -2,7 +2,7 @@ package org.hydrogen;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.Optional;
 
 public final class Router implements Handler {
     private final List<Route> routes;
@@ -20,8 +20,9 @@ public final class Router implements Handler {
     @Override
     public Response handle(Request request) {
         for (Route route : routes) {
-            if (route.getPredicate().test(request)) {
-                return route.getHandler().handle(request);
+            Optional<Response> result = route.check(request);
+            if (result.isPresent()) {
+                return result.get();
             }
         }
         return notFound.handle(request);
@@ -54,18 +55,17 @@ public final class Router implements Handler {
 
         public Builder bind(String passedPath, StaticDirectory staticDirectory) {
             String path = requireSlashEnclosed(passedPath);
-            Route route = new Route(req -> req.getUrl().startsWith(path) &&
-                    staticDirectory.isPathValid(removePath(path, req.getUrl())),
-                    req -> {
-                        String filePath = removePath(path, req.getUrl());
-                        if (staticDirectory.isPathValid(filePath)) {
-                            byte[] bytes = staticDirectory.load(filePath);
-                            String[] pathParts = filePath.split("\\.");
-                            String extension = pathParts[pathParts.length - 1];
-                            ContentType contentType = ContentType.of(extension);
-                            return Response.ok().body(contentType, bytes);
-                        } else return Response.notFound().text("404 Not Found");
-                    });
+            Route route = req -> {
+                String filePath = removePath(path, req.getUrl());
+                if (req.getUrl().startsWith(path) &&
+                        staticDirectory.isPathValid(filePath)) {
+                    byte[] bytes = staticDirectory.load(filePath);
+                    String[] pathParts = filePath.split("\\.");
+                    String extension = pathParts[pathParts.length - 1];
+                    ContentType contentType = ContentType.of(extension);
+                    return Optional.of(Response.ok().body(contentType, bytes));
+                } else return Optional.empty();
+            };
             routes.add(route);
             return this;
         }
@@ -79,13 +79,25 @@ public final class Router implements Handler {
             return this;
         }
 
+        /**
+         * @param url The url to match to.
+         * @param handler The handler taking a request, a set of path variables,
+         * and returning a response.
+         * @return This object for call chaining.
+         */
+        public Builder get(String url, VariableHandler handler) {
+            routes.add(Route.matchVariable(RequestMethod.GET, url, handler));
+            return this;
+        }
+
         public Builder group(String url, Handler handler) {
-            Predicate<Request> predicate = req -> req.getUrl().startsWith(url);
-            Handler modifiedHandler = req -> {
-                String newUrl = req.getUrl().substring(url.length());
-                return handler.handle(req.withUrl(newUrl));
+            Route route = req -> {
+                if (req.getUrl().startsWith(url)) {
+                    String newUrl = req.getUrl().substring(url.length());
+                    return Optional.of(handler.handle(req.withUrl(newUrl)));
+                } else return Optional.empty();
             };
-            routes.add(new Route(predicate, modifiedHandler));
+            routes.add(route);
             return this;
         }
 

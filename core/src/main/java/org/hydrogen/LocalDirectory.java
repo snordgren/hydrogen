@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class LocalDirectory extends AbstractStaticDirectory {
+public final class LocalDirectory extends AbstractStaticDirectory {
     public LocalDirectory(String directory) {
         super(directory);
     }

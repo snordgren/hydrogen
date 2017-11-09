@@ -1,27 +1,35 @@
 package org.hydrogen;
 
-import java.util.function.Predicate;
+import java.util.Map;
+import java.util.Optional;
 
-public class Route {
-    private final Predicate<Request> predicate;
-    private final Handler handler;
+/**
+ * A route is a handler that may or may not return a result depending on the
+ * URL and HTTP method.
+ */
+@FunctionalInterface
+public interface Route {
 
-    public Route(Predicate<Request> predicate, Handler handler) {
-        this.handler = handler;
-        this.predicate = predicate;
+    Optional<Response> check(Request request);
+
+    static Route match(RequestMethod method, String url, Handler handler) {
+        Pattern pattern = new Pattern(url);
+        return req -> {
+            if (req.getMethod() == method) {
+                Optional<Map<String, String>> variableMap = pattern.match(req.getUrl());
+                return variableMap.map(vars -> handler.handle(req));
+            } else return Optional.empty();
+        };
     }
 
-    public Handler getHandler() {
-        return handler;
-    }
-
-    public Predicate<Request> getPredicate() {
-        return predicate;
-    }
-
-    public static Route match(RequestMethod method, String path, Handler handler) {
-        return new Route(req -> req.getMethod() == method &&
-                req.getUrl().equalsIgnoreCase(path),
-                handler);
+    static Route matchVariable(RequestMethod method, String url,
+            VariableHandler handler) {
+        Pattern pattern = new Pattern(url);
+        return req -> {
+            if (req.getMethod() == method) {
+                Optional<Map<String, String>> variableMap = pattern.match(req.getUrl());
+                return variableMap.map(vars -> handler.handle(req, vars));
+            } else return Optional.empty();
+        };
     }
 }
