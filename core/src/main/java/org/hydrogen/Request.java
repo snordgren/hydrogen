@@ -62,7 +62,7 @@ public class Request {
         return url;
     }
 
-    public boolean hasQueryParameter(String name) {
+    public boolean hasQueryParam(String name) {
         return getQueryParams().containsKey(name);
     }
 

@@ -56,16 +56,18 @@ public final class Response {
         return statusCode;
     }
 
-    public static Builder found() {
-        return status(StatusCode.FOUND);
+    public static Builder found(String url) {
+        return status(StatusCode.FOUND)
+                .header("Location", url);
     }
 
     public static Builder notFound() {
         return status(StatusCode.NOT_FOUND);
     }
 
-    public static Builder movedPermanently() {
-        return status(StatusCode.MOVED_PERMANENTLY);
+    public static Builder movedPermanently(String url) {
+        return status(StatusCode.MOVED_PERMANENTLY)
+                .header("Location", url);
     }
 
     public static Builder ok() {
