@@ -15,6 +15,7 @@ public final class ClasspathDirectory extends AbstractStaticDirectory {
 
     @Override
     public boolean isPathValid(String path) {
+        System.out.println("isPathValid: " + path);
         return getClassLoader().getResource(buildPath(path)) != null;
     }
 

@@ -33,6 +33,10 @@ public final class Router implements Handler {
         private Handler notFound;
 
         private static String requireSlashEnclosed(String s) {
+            if (s == null || s.isEmpty() || s.equals("/")) {
+                return "/";
+            }
+
             String enclosure = "/";
             StringBuilder b = new StringBuilder();
             if (!s.startsWith(enclosure)) {
@@ -54,13 +58,18 @@ public final class Router implements Handler {
             Route route = req -> {
                 if (req.getUrl().startsWith(path)) {
                     String filePath = removePath(path, req.getUrl());
-                    if (staticDirectory.isPathValid(filePath)) {
+                    if (staticDirectory.isPathValid(filePath) && filePath.contains(".")) {
+                        System.out.println("Here.");
                         byte[] bytes = staticDirectory.load(filePath);
                         String[] pathParts = filePath.split("\\.");
                         String extension = pathParts[pathParts.length - 1];
                         ContentType contentType = ContentType.of(extension)
-                                .orElseThrow(() -> new RuntimeException(
-                                        "Could not get content type of " + filePath + "."));
+                                .orElseThrow(() -> {
+                                    String s = "Unable to deduce MIME type of " +
+                                            filePath + " in the request to " +
+                                            req.getUrl();
+                                    return new RuntimeException(s);
+                                });
                         return Optional.of(Response.ok().body(contentType, bytes));
                     } else return Optional.empty();
                 } else return Optional.empty();

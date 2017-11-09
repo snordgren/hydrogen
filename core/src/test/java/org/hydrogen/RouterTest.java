@@ -5,6 +5,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class RouterTest {
+    private final String expectedContents = "Lorem ipsum dolor sit amet.";
+
     @Test
     public void testBasicRoute() {
         String expectedGet = "GET index";
@@ -35,7 +37,6 @@ public class RouterTest {
 
     @Test
     public void testStaticFiles() {
-        String expectedContents = "Lorem ipsum dolor sit amet.";
         Router router = Router.builder()
                 .bind("public", new ClasspathDirectory(""))
                 .build();
@@ -53,4 +54,24 @@ public class RouterTest {
                 .build();
         router.handle(new Request(RequestMethod.GET, ""));
     }
+
+    @Test
+    public void testRootStaticDirectory() {
+        Router router = Router.builder()
+                .bind("", new ClasspathDirectory("/"))
+                .get("/", req -> Response.ok().text("Yes."))
+                .build();
+
+        assertEquals("Yes.", router.handle(new Request(RequestMethod.GET, ""))
+                .getBodyAsString());
+
+        assertEquals(expectedContents, router.handle(
+                new Request(RequestMethod.GET, "/TestFile.txt"))
+                .getBodyAsString());
+
+        assertEquals(expectedContents, router.handle(
+                new Request(RequestMethod.GET, "/dir/TestFile.txt"))
+                .getBodyAsString());
+    }
+
 }
