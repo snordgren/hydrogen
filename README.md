@@ -23,4 +23,5 @@ server runtime, because requests and responses are both simple POJOs.
 ## Disclaimer
 Hydrogen is not battle-tested, nor is it ready for production use (yet). Look
 out for version 1.0.0, in the meantime, make sure to watch, star, and post
-your suggestions in the issue tracker.
+your suggestions in the issue tracker. Contributions are very welcome, this 
+project is in its infancy and all feedback and input is welcome and appreciated.
