@@ -20,6 +20,7 @@ public class ClasspathDirectoryTest {
         ClasspathDirectory directory = new ClasspathDirectory("");
         assertTrue(directory.isPathValid("TestFile.txt"));
         assertEquals(expectedContents, loadString(directory, "TestFile.txt"));
+        assertEquals(expectedContents, loadString(directory, "dir/TestFile.txt"));
     }
 
     @Test
