@@ -62,9 +62,14 @@ public class Request {
         return url;
     }
 
+    public boolean hasQueryParameter(String name) {
+        return getQueryParams().containsKey(name);
+    }
+
     public static Request get(String url) {
         return new Request(RequestMethod.GET, url);
     }
+
 
     public static Request post(String url) {
         return new Request(RequestMethod.POST, url);
