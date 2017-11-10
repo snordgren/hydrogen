@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -40,6 +41,14 @@ public final class Servlet extends HttpServlet {
                 httpSession.setAttribute(name, session.getAttribute(name)));
     }
 
+    private static String decode(String s) {
+        try {
+            return URLDecoder.decode(s, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static <T> Map<String, T> extractEnumMap(
             Enumeration<String> enumeration,
             Function<String, T> accessor) {
@@ -60,10 +69,12 @@ public final class Servlet extends HttpServlet {
         return set;
     }
 
-    private static Map<String, String> buildQueryParamMap(String str) {
-        if (str == null || str.isEmpty()) {
+    private static Map<String, String> buildQueryParamMap(HttpServletRequest req) {
+        String encodedStr = req.getQueryString();
+        if (encodedStr == null || encodedStr.isEmpty()) {
             return Collections.emptyMap();
         } else {
+            String str = decode(encodedStr);
             if (str.startsWith("&")) {
                 str = str.substring(1);
             }
@@ -105,9 +116,8 @@ public final class Servlet extends HttpServlet {
 
     public static Request mapRequest(HttpServletRequest req) throws IOException {
         RequestMethod method = RequestMethod.valueOf(req.getMethod());
-        String url = URLDecoder.decode(req.getRequestURI(), "UTF-8");
-        String decodedQuery = URLDecoder.decode(req.getQueryString(), "UTF-8");
-        Map<String, String> queryParams = buildQueryParamMap(decodedQuery);
+        String url = decode(req.getRequestURI());
+        Map<String, String> queryParams = buildQueryParamMap(req);
         Map<String, String> headers = extractEnumMap(req.getHeaderNames(),
                 req::getHeader);
         InputStream body = req.getInputStream();
