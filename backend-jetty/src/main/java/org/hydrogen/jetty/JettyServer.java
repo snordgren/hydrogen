@@ -2,7 +2,7 @@ package org.hydrogen.jetty;
 
 import org.eclipse.jetty.server.Server;
 
-public class JettyServer implements org.hydrogen.Server {
+public final class JettyServer implements org.hydrogen.Server {
     private final Server server;
 
     JettyServer(Server server) {

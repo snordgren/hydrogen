@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-public class Servlet extends HttpServlet {
+public final class Servlet extends HttpServlet {
     private final Handler handler;
 
     public Servlet(Handler handler) {

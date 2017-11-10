@@ -9,8 +9,12 @@ import org.hydrogen.Servlet;
 /**
  * Servlet runtime for using Jetty.
  */
-public class Jetty {
+public final class Jetty {
     private static final int DEFAULT_PORT = 8080;
+
+    private Jetty() {
+
+    }
 
     /**
      * Starts a new server on the default port (8080) using a handler. Use

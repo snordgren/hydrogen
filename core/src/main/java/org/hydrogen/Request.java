@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Map;
 
-public class Request {
+public final class Request {
     private final String url;
     private final RequestMethod method;
     private final Map<String, String> queryParams, headers;
