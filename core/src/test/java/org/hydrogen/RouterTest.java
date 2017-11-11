@@ -3,6 +3,7 @@ package org.hydrogen;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RouterTest {
     private final String expectedContents = "Lorem ipsum dolor sit amet.";
@@ -74,4 +75,15 @@ public class RouterTest {
                 .getBodyAsString());
     }
 
+    @Test
+    public void testRouteParams() {
+        Router router = Router.builder()
+                .get("/:page", req -> {
+                    assertTrue(req.hasRouteParam(":page"));
+                    return Response.ok().text(req.getRouteParam(":page"));
+                })
+                .build();
+        assertEquals("here", router.handle(Request.get("/here")).getBodyAsString());
+        assertEquals("there", router.handle(Request.get("/there")).getBodyAsString());
+    }
 }

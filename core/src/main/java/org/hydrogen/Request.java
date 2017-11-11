@@ -42,6 +42,22 @@ public final class Request {
         return body;
     }
 
+    /**
+     * Returns a builder pre-configured with the values of this request as the
+     * default.
+     *
+     * @return The builder to use.
+     */
+    public Builder getBuilder() {
+        return builder()
+                .method(method)
+                .headers(headers)
+                .routeParams(routeParams)
+                .queryParams(queryParams)
+                .body(body)
+                .session(session);
+    }
+
     public String getQueryParam(String name) {
         return getQueryParams().get(name);
     }
@@ -62,6 +78,10 @@ public final class Request {
         return method;
     }
 
+    public String getRouteParam(String name) {
+        return routeParams.get(name);
+    }
+
     public Map<String, String> getRouteParams() {
         return routeParams;
     }
@@ -74,8 +94,28 @@ public final class Request {
         return url;
     }
 
+    public boolean hasHeader(String name) {
+        return headers.containsKey(name);
+    }
+
     public boolean hasQueryParam(String name) {
-        return getQueryParams().containsKey(name);
+        return queryParams.containsKey(name);
+    }
+
+    public boolean hasRouteParam(String name) {
+        return routeParams.containsKey(name);
+    }
+
+    public Request withRouteParams(Map<String, String> routeParams) {
+        return getBuilder().routeParams(routeParams).build();
+    }
+
+    public Request withUrl(String url) {
+        return getBuilder().url(url).build();
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static Request get(String url) {
@@ -84,15 +124,6 @@ public final class Request {
 
     public static Request post(String url) {
         return new Request(RequestMethod.POST, url);
-    }
-
-    public Request withUrl(String url) {
-        return new Request(method, url, routeParams, queryParams, headers,
-                body, session);
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {
@@ -143,6 +174,12 @@ public final class Request {
 
         public Builder routeParam(String param, String value) {
             routeParams.put(param, value);
+            return this;
+        }
+
+        public Builder routeParams(Map<String, String> routeParams) {
+            this.routeParams.clear();
+            this.routeParams.putAll(routeParams);
             return this;
         }
 

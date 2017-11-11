@@ -86,17 +86,6 @@ public final class Router implements Handler {
             return this;
         }
 
-        /**
-         * @param url The url to match to.
-         * @param handler The handler taking a request, a set of path variables,
-         * and returning a response.
-         * @return This object for call chaining.
-         */
-        public Builder get(String url, VariableHandler handler) {
-            routes.add(Route.matchVariable(RequestMethod.GET, url, handler));
-            return this;
-        }
-
         public Builder group(String url, Handler handler) {
             Route route = req -> {
                 if (req.getUrl().startsWith(url)) {

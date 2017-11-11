@@ -16,19 +16,9 @@ public interface Route {
         Pattern pattern = new Pattern(url);
         return req -> {
             if (req.getMethod() == method) {
-                Optional<Map<String, String>> variableMap = pattern.match(req.getUrl());
-                return variableMap.map(vars -> handler.handle(req));
-            } else return Optional.empty();
-        };
-    }
-
-    static Route matchVariable(RequestMethod method, String url,
-            VariableHandler handler) {
-        Pattern pattern = new Pattern(url);
-        return req -> {
-            if (req.getMethod() == method) {
-                Optional<Map<String, String>> variableMap = pattern.match(req.getUrl());
-                return variableMap.map(vars -> handler.handle(req, vars));
+                Optional<Map<String, String>> routeParams = pattern.match(req.getUrl());
+                return routeParams.map(vars ->
+                        handler.handle(req.withRouteParams(vars)));
             } else return Optional.empty();
         };
     }
