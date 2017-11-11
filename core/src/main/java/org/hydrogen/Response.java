@@ -14,18 +14,18 @@ import java.util.Optional;
  */
 public final class Response {
     private static final Charset UTF_8 = Charset.forName("UTF-8");
-    private final StatusCode statusCode;
+    private final Status status;
     private final Optional<Session> session;
     private final Map<String, String> headers;
     private final ContentType contentType;
     private final byte[] body;
 
-    private Response(StatusCode statusCode,
+    private Response(Status status,
             Map<String, String> headers,
             ContentType contentType,
             byte[] body,
             Optional<Session> session) {
-        this.statusCode = statusCode;
+        this.status = status;
         this.headers = Collections.unmodifiableMap(headers);
         this.contentType = contentType;
         this.body = body;
@@ -52,49 +52,49 @@ public final class Response {
         return session;
     }
 
-    public StatusCode getStatusCode() {
-        return statusCode;
+    public Status getStatus() {
+        return status;
     }
 
     public static Builder found(String url) {
-        return status(StatusCode.FOUND)
+        return status(Status.FOUND)
                 .header("Location", url);
     }
 
     public static Builder notFound() {
-        return status(StatusCode.NOT_FOUND);
+        return status(Status.NOT_FOUND);
     }
 
     public static Builder movedPermanently(String url) {
-        return status(StatusCode.MOVED_PERMANENTLY)
+        return status(Status.MOVED_PERMANENTLY)
                 .header("Location", url);
     }
 
     public static Builder ok() {
-        return status(StatusCode.OK);
+        return status(Status.OK);
     }
 
     public static Response redirect(String url) {
-        return redirect(url, StatusCode.FOUND);
+        return redirect(url, Status.FOUND);
     }
 
-    public static Response redirect(String url, StatusCode statusCode) {
-        return status(statusCode)
+    public static Response redirect(String url, Status status) {
+        return status(status)
                 .header("Location", url)
                 .emptyBody();
     }
 
-    public static Builder status(StatusCode statusCode) {
-        return new Builder(statusCode);
+    public static Builder status(Status status) {
+        return new Builder(status);
     }
 
     public static final class Builder {
-        private final StatusCode statusCode;
+        private final Status status;
         private final Map<String, String> headers = new HashMap<>();
         private Session session = null;
 
-        public Builder(StatusCode statusCode) {
-            this.statusCode = statusCode;
+        public Builder(Status status) {
+            this.status = status;
         }
 
         public Builder header(String name, String value) {
@@ -106,7 +106,7 @@ public final class Response {
 
         public Response body(ContentType contentType, byte[] body) {
             return new Response(
-                    statusCode,
+                    status,
                     headers,
                     contentType,
                     body,
@@ -115,7 +115,7 @@ public final class Response {
 
         private Response createTextResponse(ContentType contentType, String text) {
             return new Response(
-                    statusCode,
+                    status,
                     headers,
                     contentType,
                     text.getBytes(UTF_8),
@@ -124,7 +124,7 @@ public final class Response {
 
         public Response emptyBody() {
             return new Response(
-                    statusCode,
+                    status,
                     headers,
                     ContentType.HTML,
                     new byte[0],

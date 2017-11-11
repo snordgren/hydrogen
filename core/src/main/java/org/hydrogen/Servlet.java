@@ -103,7 +103,7 @@ public final class Servlet extends HttpServlet {
 
         response.getHeaders().forEach(resp::addHeader);
         resp.setContentType(response.getContentType().getText());
-        resp.setStatus(response.getStatusCode().getNumber());
+        resp.setStatus(response.getStatus().getNumber());
 
         // NOTE: Once we start writing to the body, we can no longer add headers.
         if (response.getBody().length > 0) {

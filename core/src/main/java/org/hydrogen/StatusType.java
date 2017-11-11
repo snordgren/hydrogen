@@ -2,7 +2,7 @@ package org.hydrogen;
 
 import java.util.Arrays;
 
-public enum StatusCodeType {
+public enum StatusType {
     INFORMATION(100),
     SUCCESSFUL_RESPONSE(200),
     REDIRECTION_MESSAGE(300),
@@ -11,11 +11,11 @@ public enum StatusCodeType {
 
     private final int rangeStart;
 
-    StatusCodeType(int rangeStart) {
+    StatusType(int rangeStart) {
         this.rangeStart = rangeStart;
     }
 
-    public static StatusCodeType forCode(int code) {
+    public static StatusType forCode(int code) {
         return Arrays.stream(values())
                 .filter(type -> code >= type.rangeStart && code < type.rangeStart + 100)
                 .findFirst()

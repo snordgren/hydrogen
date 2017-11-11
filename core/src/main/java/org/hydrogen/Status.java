@@ -5,7 +5,7 @@ package org.hydrogen;
  *
  * @author Silas Nordgren
  */
-public enum StatusCode {
+public enum Status {
     CONTINUE(100),
     SWITCHING_PROTOCOL(101),
     OK(200),
@@ -53,18 +53,18 @@ public enum StatusCode {
     NETWORK_AUTHENTICATION_REQUIRED(511);
 
     private final int number;
-    private final StatusCodeType type;
+    private final StatusType type;
 
-    StatusCode(int number) {
+    Status(int number) {
         this.number = number;
-        this.type = StatusCodeType.forCode(number);
+        this.type = StatusType.forCode(number);
     }
 
     public int getNumber() {
         return number;
     }
 
-    public StatusCodeType getType() {
+    public StatusType getType() {
         return type;
     }
 }
