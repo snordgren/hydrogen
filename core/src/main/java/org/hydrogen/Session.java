@@ -9,6 +9,9 @@ import java.util.Set;
  * Represents a user session.
  */
 public class Session {
+    private static final Session EMPTY_SESSION =
+            new Session("", true, false, Collections.emptyMap());
+
     private final Map<String, Object> attributes;
     private final Set<String> attributeNames;
     private final String id;
@@ -81,6 +84,6 @@ public class Session {
     }
 
     public static Session empty() {
-        return new Session("", true, false, Collections.emptyMap());
+        return EMPTY_SESSION;
     }
 }

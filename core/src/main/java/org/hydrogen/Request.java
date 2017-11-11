@@ -2,7 +2,7 @@ package org.hydrogen;
 
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public final class Request {
@@ -31,9 +31,9 @@ public final class Request {
             Session session) {
         this.method = method;
         this.url = url;
-        this.routeParams = Collections.unmodifiableMap(routeParams);
-        this.queryParams = Collections.unmodifiableMap(queryParams);
-        this.headers = Collections.unmodifiableMap(headers);
+        this.routeParams = new LinkedHashMap<>(routeParams);
+        this.queryParams = new LinkedHashMap<>(queryParams);
+        this.headers = new LinkedHashMap<>(headers);
         this.body = body;
         this.session = session;
     }
@@ -58,24 +58,24 @@ public final class Request {
                 .session(session);
     }
 
-    public String getQueryParam(String name) {
-        return getQueryParams().get(name);
-    }
-
-    public Map<String, String> getQueryParams() {
-        return queryParams;
-    }
-
     public String getHeader(String name) {
         return getHeaders().get(name);
     }
 
     public Map<String, String> getHeaders() {
-        return headers;
+        return Collections.unmodifiableMap(headers);
     }
 
     public RequestMethod getMethod() {
         return method;
+    }
+
+    public String getQueryParam(String name) {
+        return queryParams.get(name);
+    }
+
+    public Map<String, String> getQueryParams() {
+        return Collections.unmodifiableMap(queryParams);
     }
 
     public String getRouteParam(String name) {
@@ -83,7 +83,7 @@ public final class Request {
     }
 
     public Map<String, String> getRouteParams() {
-        return routeParams;
+        return Collections.unmodifiableMap(routeParams);
     }
 
     public Session getSession() {
@@ -127,13 +127,13 @@ public final class Request {
     }
 
     public static class Builder {
-        private String url;
-        private RequestMethod method;
-        private final Map<String, String> routeParams = new HashMap<>(),
-                queryParams = new HashMap<>(),
-                headers = new HashMap<>();
-        private InputStream body;
-        private Session session;
+        private String url = "/";
+        private RequestMethod method = RequestMethod.GET;
+        private Map<String, String> routeParams = new LinkedHashMap<>(),
+                queryParams = new LinkedHashMap<>(),
+                headers = new LinkedHashMap<>();
+        private InputStream body = null;
+        private Session session = Session.empty();
 
         public Builder body(InputStream body) {
             this.body = body;
@@ -151,8 +151,7 @@ public final class Request {
         }
 
         public Builder headers(Map<String, String> headers) {
-            this.headers.clear();
-            this.headers.putAll(headers);
+            this.headers = headers;
             return this;
         }
 
@@ -167,8 +166,7 @@ public final class Request {
         }
 
         public Builder queryParams(Map<String, String> queryParams) {
-            this.queryParams.clear();
-            this.queryParams.putAll(queryParams);
+            this.queryParams = queryParams;
             return this;
         }
 
@@ -178,8 +176,7 @@ public final class Request {
         }
 
         public Builder routeParams(Map<String, String> routeParams) {
-            this.routeParams.clear();
-            this.routeParams.putAll(routeParams);
+            this.routeParams = routeParams;
             return this;
         }
 
