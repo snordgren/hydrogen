@@ -2,28 +2,36 @@ package org.hydrogen;
 
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class Request {
     private final String url;
     private final RequestMethod method;
-    private final Map<String, String> queryParams, headers;
+    private final Map<String, String> routeParams, queryParams, headers;
     private final InputStream body;
     private final Session session;
 
-    public Request(RequestMethod method, String url) {
-        this(method, url, Collections.emptyMap(), Collections.emptyMap(),
-                null, Session.empty());
+    private Request(RequestMethod method, String url) {
+        this(method,
+                url,
+                Collections.emptyMap(),
+                Collections.emptyMap(),
+                Collections.emptyMap(),
+                null,
+                Session.empty());
     }
 
     public Request(RequestMethod method,
             String url,
+            Map<String, String> routeParams,
             Map<String, String> queryParams,
             Map<String, String> headers,
             InputStream body,
             Session session) {
         this.method = method;
         this.url = url;
+        this.routeParams = Collections.unmodifiableMap(routeParams);
         this.queryParams = Collections.unmodifiableMap(queryParams);
         this.headers = Collections.unmodifiableMap(headers);
         this.body = body;
@@ -54,6 +62,10 @@ public final class Request {
         return method;
     }
 
+    public Map<String, String> getRouteParams() {
+        return routeParams;
+    }
+
     public Session getSession() {
         return session;
     }
@@ -70,17 +82,78 @@ public final class Request {
         return new Request(RequestMethod.GET, url);
     }
 
-
     public static Request post(String url) {
         return new Request(RequestMethod.POST, url);
     }
 
     public Request withUrl(String url) {
-        return new Request(method, url, queryParams, headers, body, session);
+        return new Request(method, url, routeParams, queryParams, headers,
+                body, session);
     }
 
-    @Override
-    public String toString() {
-        return getMethod().toString() + " " + getUrl();
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private String url;
+        private RequestMethod method;
+        private final Map<String, String> routeParams = new HashMap<>(),
+                queryParams = new HashMap<>(),
+                headers = new HashMap<>();
+        private InputStream body;
+        private Session session;
+
+        public Builder body(InputStream body) {
+            this.body = body;
+            return this;
+        }
+
+        public Request build() {
+            return new Request(method, url, routeParams, queryParams, headers,
+                    body, session);
+        }
+
+        public Builder header(String header, String value) {
+            headers.put(header, value);
+            return this;
+        }
+
+        public Builder headers(Map<String, String> headers) {
+            this.headers.clear();
+            this.headers.putAll(headers);
+            return this;
+        }
+
+        public Builder method(RequestMethod method) {
+            this.method = method;
+            return this;
+        }
+
+        public Builder queryParam(String param, String value) {
+            queryParams.put(param, value);
+            return this;
+        }
+
+        public Builder queryParams(Map<String, String> queryParams) {
+            this.queryParams.clear();
+            this.queryParams.putAll(queryParams);
+            return this;
+        }
+
+        public Builder routeParam(String param, String value) {
+            routeParams.put(param, value);
+            return this;
+        }
+
+        public Builder session(Session session) {
+            this.session = session;
+            return this;
+        }
+
+        public Builder url(String url) {
+            this.url = url;
+            return this;
+        }
     }
 }

@@ -132,6 +132,13 @@ public final class Servlet extends HttpServlet {
                 httpSession.isNew(),
                 true,
                 sessionAttributes);
-        return new Request(method, url, queryParams, headers, body, session);
+        return Request.builder()
+                .method(method)
+                .url(url)
+                .queryParams(queryParams)
+                .headers(headers)
+                .body(body)
+                .session(session)
+                .build();
     }
 }

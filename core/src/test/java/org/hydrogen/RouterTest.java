@@ -31,7 +31,7 @@ public class RouterTest {
         Router router = Router.builder()
                 .group("/user", user)
                 .build();
-        Response response = router.handle(new Request(RequestMethod.GET, "/user/"));
+        Response response = router.handle(Request.get("/user/"));
         assertEquals(expected, response.getBodyAsString());
     }
 
@@ -40,7 +40,7 @@ public class RouterTest {
         Router router = Router.builder()
                 .bind("public", new ClasspathDirectory(""))
                 .build();
-        Request request = new Request(RequestMethod.GET, "/public/TestFile.txt");
+        Request request = Request.get("/public/TestFile.txt");
         Response response = router.handle(request);
         assertEquals(expectedContents, response.getBodyAsString());
     }
@@ -52,7 +52,7 @@ public class RouterTest {
                 .get("wonderfully/long", request -> Response.ok().text("No."))
                 .get("", request -> Response.ok().text("Yes."))
                 .build();
-        router.handle(new Request(RequestMethod.GET, ""));
+        router.handle(Request.get(""));
     }
 
     @Test
@@ -62,15 +62,15 @@ public class RouterTest {
                 .get("/", req -> Response.ok().text("Yes."))
                 .build();
 
-        assertEquals("Yes.", router.handle(new Request(RequestMethod.GET, ""))
+        assertEquals("Yes.", router.handle(Request.get(""))
                 .getBodyAsString());
 
         assertEquals(expectedContents, router.handle(
-                new Request(RequestMethod.GET, "/TestFile.txt"))
+                Request.get("/TestFile.txt"))
                 .getBodyAsString());
 
         assertEquals(expectedContents, router.handle(
-                new Request(RequestMethod.GET, "/dir/TestFile.txt"))
+                Request.get("/dir/TestFile.txt"))
                 .getBodyAsString());
     }
 
