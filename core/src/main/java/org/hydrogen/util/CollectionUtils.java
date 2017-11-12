@@ -6,7 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class CollectionUtils {
+public final class CollectionUtils {
+    private CollectionUtils() {
+    }
+
     public static <T> Set<T> toImmutable(Set<T> set) {
         return Collections.unmodifiableSet(new LinkedHashSet<>(set));
     }
