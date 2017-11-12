@@ -124,6 +124,20 @@ public final class Request {
         return new Request(RequestMethod.GET, url);
     }
 
+    public static Request getLocalhost(int port) {
+        return getLocalhost(port, false);
+    }
+
+    public static Request getLocalhost(int port, boolean https) {
+        String protocol;
+        if (https) {
+            protocol = "https";
+        } else {
+            protocol = "http";
+        }
+        return get(protocol + "://localhost:" + port);
+    }
+
     public static Request post(String url) {
         return new Request(RequestMethod.POST, url);
     }
