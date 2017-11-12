@@ -13,15 +13,17 @@ import org.hydrogen.Session;
 import org.json.JSONArray;
 import org.junit.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class JettyServerTest {
-    private static final Counter portCounter = new Counter(8000);
+    private static final AtomicInteger portCounter = new AtomicInteger(8000);
 
     @Test
     public void testHTML() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port);
         final String expected = "<h1>Hi!</h1>";
         Jetty.use(port, request -> {
@@ -35,7 +37,7 @@ public class JettyServerTest {
 
     @Test
     public void testJSON() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port);
         Handler handler = request -> Response.ok().json("{ values: [1, 2, 3] }");
         Jetty.use(port, handler, server -> {
@@ -49,7 +51,7 @@ public class JettyServerTest {
 
     @Test
     public void testMultipleRoutes() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port);
         final String expected0 = "Ok: 0";
         final String expected1 = "Ok: 1";
@@ -69,7 +71,7 @@ public class JettyServerTest {
 
     @Test
     public void testPost() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port);
         final String expected = "Ok.";
         Jetty.use(port, request -> {
@@ -82,7 +84,7 @@ public class JettyServerTest {
 
     @Test
     public void testText() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port);
         final String expected = "Hello, world!";
         Jetty.use(port, request -> {
@@ -98,7 +100,7 @@ public class JettyServerTest {
 
     @Test
     public void testXML() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port);
         final String expected = "<awful>truly</awful>";
         Jetty.use(port, request -> Response.ok().xml(expected), server -> {
@@ -108,7 +110,7 @@ public class JettyServerTest {
 
     @Test
     public void testHeader() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port);
         String header = "Cache-Control";
         String expected = "max-age=3600";
@@ -125,7 +127,7 @@ public class JettyServerTest {
 
     @Test
     public void testSession() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port);
         Jetty.use(port, request -> {
             Session session = request.getSession();
@@ -146,7 +148,7 @@ public class JettyServerTest {
 
     @Test
     public void testQueryParams() {
-        int port = portCounter.next();
+        int port = portCounter.getAndIncrement();
         String localhost = localhost(port) + "?name=Me&password=1234&pin=9999";
         Jetty.use(port, request -> {
             assertEquals("/", request.getUrl());
@@ -160,19 +162,5 @@ public class JettyServerTest {
 
     private static String localhost(int port) {
         return "http://localhost:" + port;
-    }
-
-    private static class Counter {
-        private int currentValue;
-
-        Counter(int initialValue) {
-            currentValue = initialValue;
-        }
-
-        int next() {
-            int current = currentValue;
-            currentValue++;
-            return current;
-        }
     }
 }
