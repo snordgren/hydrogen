@@ -1,5 +1,7 @@
 package org.hydrogen;
 
+import org.hydrogen.util.CollectionUtils;
+
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -31,9 +33,9 @@ public final class Request {
             Session session) {
         this.method = method;
         this.url = url;
-        this.routeParams = new LinkedHashMap<>(routeParams);
-        this.queryParams = new LinkedHashMap<>(queryParams);
-        this.headers = new LinkedHashMap<>(headers);
+        this.routeParams = CollectionUtils.toImmutable(routeParams);
+        this.queryParams = CollectionUtils.toImmutable(queryParams);
+        this.headers = CollectionUtils.toImmutable(headers);
         this.body = body;
         this.session = session;
     }
@@ -63,7 +65,7 @@ public final class Request {
     }
 
     public Map<String, String> getHeaders() {
-        return Collections.unmodifiableMap(headers);
+        return headers;
     }
 
     public RequestMethod getMethod() {
@@ -75,7 +77,7 @@ public final class Request {
     }
 
     public Map<String, String> getQueryParams() {
-        return Collections.unmodifiableMap(queryParams);
+        return queryParams;
     }
 
     public String getRouteParam(String name) {
@@ -83,7 +85,7 @@ public final class Request {
     }
 
     public Map<String, String> getRouteParams() {
-        return Collections.unmodifiableMap(routeParams);
+        return routeParams;
     }
 
     public Session getSession() {

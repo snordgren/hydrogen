@@ -1,7 +1,8 @@
 package org.hydrogen;
 
+import org.hydrogen.util.CollectionUtils;
+
 import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -26,7 +27,7 @@ public final class Response {
             byte[] body,
             Optional<Session> session) {
         this.status = status;
-        this.headers = Collections.unmodifiableMap(headers);
+        this.headers = CollectionUtils.toImmutable(headers);
         this.contentType = contentType;
         this.body = body;
         this.session = session;
@@ -38,6 +39,15 @@ public final class Response {
 
     public String getBodyAsString() {
         return new String(getBody(), UTF_8);
+    }
+
+    public Builder getBuilder() {
+        return new Builder()
+                .status(status)
+                .headers(headers)
+                .contentType(contentType)
+                .body(body)
+                .session(session.orElse(null));
     }
 
     public ContentType getContentType() {
@@ -85,16 +95,17 @@ public final class Response {
     }
 
     public static Builder status(Status status) {
-        return new Builder(status);
+        return new Builder().status(status);
     }
 
     public static final class Builder {
-        private final Status status;
-        private final Map<String, String> headers = new HashMap<>();
+        private Status status;
+        private ContentType contentType;
+        private Map<String, String> headers = new HashMap<>();
         private Session session = null;
+        private byte[] body;
 
-        public Builder(Status status) {
-            this.status = status;
+        private Builder() {
         }
 
         public Builder header(String name, String value) {
@@ -104,7 +115,16 @@ public final class Response {
             return this;
         }
 
+        public Builder body(byte[] body) {
+            this.body = body;
+            return this;
+        }
+
         public Response body(ContentType contentType, byte[] body) {
+            return contentType(contentType).body(body).build();
+        }
+
+        public Response build() {
             return new Response(
                     status,
                     headers,
@@ -113,22 +133,22 @@ public final class Response {
                     Optional.ofNullable(session));
         }
 
+        public Builder contentType(ContentType contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
         private Response createTextResponse(ContentType contentType, String text) {
-            return new Response(
-                    status,
-                    headers,
-                    contentType,
-                    text.getBytes(UTF_8),
-                    Optional.ofNullable(session));
+            return body(contentType, text.getBytes(UTF_8));
         }
 
         public Response emptyBody() {
-            return new Response(
-                    status,
-                    headers,
-                    ContentType.HTML,
-                    new byte[0],
-                    Optional.ofNullable(session));
+            return body(ContentType.HTML, new byte[0]);
+        }
+
+        public Builder headers(Map<String, String> headers) {
+            this.headers = headers;
+            return this;
         }
 
         public Response html(String text) {
@@ -142,6 +162,11 @@ public final class Response {
         public Builder session(Session session) {
             Objects.requireNonNull(session);
             this.session = session;
+            return this;
+        }
+
+        public Builder status(Status status) {
+            this.status = status;
             return this;
         }
 
