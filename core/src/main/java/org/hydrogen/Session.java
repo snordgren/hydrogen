@@ -1,5 +1,7 @@
 package org.hydrogen;
 
+import org.hydrogen.util.CollectionUtils;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +10,7 @@ import java.util.Set;
 /**
  * Represents a user session.
  */
-public class Session {
+public final class Session {
     private static final Session EMPTY_SESSION =
             new Session("", true, false, Collections.emptyMap());
 
@@ -21,8 +23,8 @@ public class Session {
         this.id = id;
         this.isNew = isNew;
         this.valid = valid;
-        this.attributes = attributes;
-        this.attributeNames = Collections.unmodifiableSet(attributes.keySet());
+        this.attributes = CollectionUtils.toImmutable(attributes);
+        this.attributeNames = CollectionUtils.toImmutable(attributes.keySet());
     }
 
     @Override
@@ -45,26 +47,52 @@ public class Session {
         return (T) attributes.get(name);
     }
 
+    /**
+     * @return The list of names of attributes associated with this session.
+     */
     public Set<String> getAttributeNames() {
         return attributeNames;
     }
 
+    /**
+     * @return The unique ID of this session.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Checks if this session has a specific attribute associated with it.
+     *
+     * @param name The name of the attribute to check for.
+     * @return True if there is an associated attribute with a matching name.
+     */
     public boolean hasAttribute(String name) {
         return attributes.containsKey(name);
     }
 
+    /**
+     * Invalidates this session, removing all associated values and invalidates
+     * the session ID.
+     *
+     * @return The invalidated session.
+     */
     public Session invalidate() {
-        return new Session(id, isNew, false, attributes);
+        return new Session(id, isNew, false, Collections.emptyMap());
     }
 
+    /**
+     * @return True if this session was created, but the client does not know
+     * of it, or has not joined it.
+     */
     public boolean isNew() {
         return isNew;
     }
 
+    /**
+     *
+     * @return True if this session has not been invalidated.
+     */
     public boolean isValid() {
         return valid;
     }
