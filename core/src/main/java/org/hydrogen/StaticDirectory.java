@@ -17,16 +17,14 @@ public abstract class StaticDirectory {
         }
     }
 
-    public Optional<Response> check(String filePath, Request req) {
+    public Optional<Response> check(String filePath) {
         if (isPathValid(filePath) && filePath.contains(".")) {
             byte[] bytes = load(filePath);
             String[] pathParts = filePath.split("\\.");
             String extension = pathParts[pathParts.length - 1];
             ContentType contentType = ContentType.of(extension)
                     .orElseThrow(() -> {
-                        String s = "Unable to deduce MIME type of " +
-                                filePath + " in the request to " +
-                                req.getUrl();
+                        String s = "Unable to deduce MIME type of " + filePath + ".";
                         return new RuntimeException(s);
                     });
             return Optional.of(Response.ok().body(contentType, bytes));

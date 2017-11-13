@@ -57,14 +57,19 @@ public final class Router implements Handler {
             String path = requireSlashEnclosed(passedPath);
             Route route = req -> {
                 if (req.getUrl().startsWith(path)) {
-                    String filePath = removePath(path, req.getUrl());
-                    return staticDirectory.check(filePath, req);
+                    return staticDirectory.check(removePath(path, req.getUrl()));
                 } else return Optional.empty();
             };
             routes.add(route);
             return this;
         }
 
+        /**
+         * Instantiates a new router from the defined not-found handler and
+         * routes.
+         *
+         * @return The new router.
+         */
         public Router build() {
             return new Router(notFound, routes);
         }
@@ -74,10 +79,20 @@ public final class Router implements Handler {
             return this;
         }
 
-        public Builder group(String url, Handler handler) {
+        /**
+         * Adds a handler for a group of routes. The handler is passed a
+         * request with its URL truncated to remove the starting path,
+         * which is shared by all routes in the group.
+         *
+         * @param passedPath The path.
+         * @param handler The handler for the group.
+         * @return This builder, for chaining.
+         */
+        public Builder group(String passedPath, Handler handler) {
+            String path = requireSlashEnclosed(passedPath);
             Route route = req -> {
-                if (req.getUrl().startsWith(url)) {
-                    String newUrl = req.getUrl().substring(url.length());
+                if (req.getUrl().startsWith(path)) {
+                    String newUrl = removePath(path, req.getUrl());
                     return Optional.of(handler.handle(req.withUrl(newUrl)));
                 } else return Optional.empty();
             };
