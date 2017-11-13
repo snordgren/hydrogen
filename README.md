@@ -1,27 +1,38 @@
 # Hydrogen
 
-Hydrogen is a *server as a function* library: a composable, immutable,
-minimal HTTP function mapping input requests to output responses. A basic
-server using Jetty as the backend can be created in just one line of code.
+A no-cruft, super light web framework for Java. Get started in one line of code:
 
 	Jetty.start(request -> Response.ok().text("Hello, world!"));
 
-Hydrogen is built with type-safety, immutability, and testability in mind.
-A server built with Hydrogen can be tested without ever starting an actual
-server runtime, because requests and responses are both simple POJOs.
-
 ## Features
- * **No Magic**. Hydrogen does not contain any static mutable state, runtime
- code generation, annotation processing, or any other kind of control-flow
- altering feature.
+ * **No Magic**. No static mutable state, runtime code generation, annotation
+ processing, or any other control flow modifications.
  * **Lightweight**. Use lightweight immutable POJOs instead of heavyweight,
- mutable server-specific objects.
- * **Backend independent**. Easily switch between multiple backends. Adding
- a new backend only requires adding support for handler management and
- request/response object conversion.
+ mutable server-specific objects. Test your code without starting a web
+ server.
+ * **Composable**. Requests and responses are immutable, handlers are 
+ `Request -> Response` functional interfaces, and filters are 
+ `Handler -> Handler` functional interfaces. Maximal code reuse!
+ 
+## Installation
+Hydrogen has not yet reached version 0.1.0, in the meantime you can use 
+[Jitpack](https://jitpack.io/#snordgren/hydrogen) with Gradle.
+Just add Jitpack to repositories:
+
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+	
+Then add the dependency.
+
+	dependencies {
+		...
+		compile 'com.github.snordgren:hydrogen:-SNAPSHOT'
+	}	
 
 ## Disclaimer
-Hydrogen is not battle-tested, nor is it ready for production use (yet). Look
-out for version 1.0.0, in the meantime, make sure to watch, star, and post
-your suggestions in the issue tracker. Contributions are very welcome, this 
-project is in its infancy and all feedback and input is welcome and appreciated.
+Don't use Hydrogen in prod! 
+
+Please post your feedback and suggestions in the issue tracker. 
+Contributions welcome!
