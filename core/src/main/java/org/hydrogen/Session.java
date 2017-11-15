@@ -114,4 +114,43 @@ public final class Session {
     public static Session empty() {
         return EMPTY_SESSION;
     }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Map<String, Object> attributes = new HashMap<>();
+        private String id = "";
+        private boolean isNew = true, valid = true;
+
+        public Session build() {
+            return new Session(id, isNew, valid, attributes);
+        }
+
+        public Builder attribute(String name, Object value) {
+            attributes.put(name, value);
+            return this;
+        }
+
+        public Builder attributes(Map<String, Object> attributes) {
+            this.attributes = attributes;
+            return this;
+        }
+
+        public Builder id(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder isNew(boolean isNew) {
+            this.isNew = isNew;
+            return this;
+        }
+
+        public Builder isValid(boolean isValid) {
+            this.valid = isValid;
+            return this;
+        }
+    }
 }
