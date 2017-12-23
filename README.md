@@ -1,6 +1,6 @@
 # Hydrogen
 
-A no-cruft, super light web framework for Java. Get started in one line of code:
+A web framework for Java. Get started in one line of code:
 
 	Jetty.start(request -> Response.ok().text("Hello, world!"));
 
