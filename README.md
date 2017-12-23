@@ -1,6 +1,6 @@
 # Hydrogen
 
-A no-cruft, super light web framework for Java. Get started in one line of code:
+A web framework for Java. Get started in one line of code:
 
 	Jetty.start(request -> Response.ok().text("Hello, world!"));
 
@@ -18,12 +18,11 @@ A no-cruft, super light web framework for Java. Get started in one line of code:
 ### Routing
 
 	Router router = Router.builder()
-    	.get("/", request -> Response.ok().html("<h1>index</h1>"))
-     	.get("/user/:name", request -> {
-    		String user = request.getRouteParam("name");
-    		return Response.ok().html("<h1>" + user + "</h1>");
-        })
-    	.build();
+		.get("/", request -> Response.ok().html("<h1>index</h1>"))
+		.get("/user/:name", request -> {
+			String user = request.getRouteParam("name");
+			return Response.ok().html("<h1>" + user + "</h1>");
+		}).build();
 	Jetty.start(3000, router);
 
 ## Installation
