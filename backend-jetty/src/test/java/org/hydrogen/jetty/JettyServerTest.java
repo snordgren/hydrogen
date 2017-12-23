@@ -6,6 +6,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.GetRequest;
 import org.hydrogen.Handler;
+import org.hydrogen.Request;
 import org.hydrogen.RequestMethod;
 import org.hydrogen.Response;
 import org.hydrogen.Router;
@@ -158,6 +159,21 @@ public class JettyServerTest {
             assertEquals("9999", request.getQueryParam("pin"));
             return Response.ok().text("Success!");
         }, server -> Unirest.post(localhost).asString());
+    }
+
+    @Test
+    public void testRouterExample() {
+        int port = portCounter.getAndIncrement();
+        Router router = Router.builder()
+                .get("/", request -> Response.ok().html("<h1>index</h1>"))
+                .get("/user/:name", request -> {
+                    String user = request.getRouteParam("name");
+                    return Response.ok().html("<h1>" + user + "</h1>");
+                })
+                .build();
+        Jetty.use(port, router, server -> {
+        });
+        assertEquals("<h1>me</h1>", new String(router.handle(Request.get("/user/me")).getBody()));
     }
 
     private static String localhost(int port) {
