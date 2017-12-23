@@ -20,7 +20,7 @@ import java.util.function.Function;
 /**
  * Servlet implementation that manages the flow of information between the
  * Java servlet API and the handler.
- * <p>
+ *
  * This class is non-final to allow Hydrogen to be ran in servlet containers.
  * To create your own servlet component, extend this class and pass your
  * handler in the constructor.
