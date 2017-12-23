@@ -81,7 +81,13 @@ public final class Request {
     }
 
     public String getRouteParam(String name) {
-        return routeParams.get(name);
+        // all params start with a colon
+        // may as well allow access without colons prepended
+        if (!name.startsWith(":")) {
+            return routeParams.get(":" + name);
+        } else {
+            return routeParams.get(name);
+        }
     }
 
     public Map<String, String> getRouteParams() {
