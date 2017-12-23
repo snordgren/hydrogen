@@ -1,6 +1,5 @@
 package org.hydrogen;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +17,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-public final class Servlet extends HttpServlet {
+/**
+ * Servlet implementation that manages the flow of information between the
+ * Java servlet API and the handler.
+ * <p>
+ * This class is non-final to allow Hydrogen to be ran in servlet containers.
+ * To create your own servlet component, extend this class and pass your
+ * handler in the constructor.
+ */
+public class Servlet extends HttpServlet {
     private final Handler handler;
 
     public Servlet(Handler handler) {
@@ -95,7 +102,7 @@ public final class Servlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws IOException {
         Request request = mapRequest(req);
         Response response = handler.handle(request);
         response.getSession().ifPresent(session ->
